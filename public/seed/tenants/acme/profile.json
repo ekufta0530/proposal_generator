@@ -1,0 +1,32 @@
+{
+  "templateVersion": "1.0.0",
+  "branding": {
+    "name": "Acme Corp",
+    "logoUrl": "",
+    "colors": {
+      "primary": "#4f46e5",
+      "secondary": "#10b981",
+      "background": "#ffffff",
+      "text": "#111827"
+    }
+  },
+  "layoutDefaults": {
+    "sections": [
+      {
+        "type": "Hero",
+        "variant": "imageLeft",
+        "props": {
+          "color": "{{branding.colors.secondary}}"
+        }
+      },
+      {
+        "type": "Problem",
+        "variant": "detailed"
+      },
+      {
+        "type": "CustomerStories",
+        "variant": "list"
+      }
+    ]
+  }
+}

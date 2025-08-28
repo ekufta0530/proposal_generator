@@ -1,0 +1,21 @@
+{
+  "templateVersion": "1.0.0",
+  "references": [
+    {
+      "id": "ref-contoso-2024",
+      "title": "Contoso replatform",
+      "quote": "Cut deploy time by 80%"
+    },
+    {
+      "id": "ref-megacorp-sre",
+      "title": "MegaCorp SRE program",
+      "quote": "35% lower infra cost"
+    }
+  ],
+  "collections": {
+    "default": [
+      "ref-contoso-2024",
+      "ref-megacorp-sre"
+    ]
+  }
+}

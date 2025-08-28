@@ -1,0 +1,32 @@
+{
+  "templateVersion": "1.0.0",
+  "branding": {
+    "name": "Default Co",
+    "logoUrl": "",
+    "colors": {
+      "primary": "#4f46e5",
+      "secondary": "#0ea5e9",
+      "background": "#ffffff",
+      "text": "#111827"
+    }
+  },
+  "layoutDefaults": {
+    "sections": [
+      {
+        "type": "Hero",
+        "variant": "simple",
+        "props": {
+          "color": "{{branding.colors.primary}}"
+        }
+      },
+      {
+        "type": "Problem",
+        "variant": "concise"
+      },
+      {
+        "type": "CustomerStories",
+        "variant": "list"
+      }
+    ]
+  }
+}

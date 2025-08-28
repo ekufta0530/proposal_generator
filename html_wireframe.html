@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Refresh: Europe — A Coca-Cola Content Creator Acceler8tor</title>
+  <meta name="description" content="Objectives, activation, amplification, timeline, reporting, scope and contact." />
+  <style>
+    :root{
+      --container: 1200px;
+      --gap: 24px;
+      --pad: 40px;
+      --brand: #e10600;   /* Coca-Cola red-ish */
+      --ink: #111;
+      --muted: #70757a;
+      --bg: #ffffff;
+      --bg-alt: #f6f6f6;
+      --radius: 14px;
+      --shadow: 0 6px 24px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;color:var(--ink);background:var(--bg)}
+    a{color:var(--brand);text-decoration:none}
+    img{max-width:100%;height:auto;display:block;border-radius:12px}
+    .container{max-width:var(--container);margin:auto;padding:0 20px}
+    header.site{
+      position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #eee
+    }
+    .nav{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:12px 0}
+    .brand{display:flex;gap:10px;align-items:center;font-weight:700}
+    .brand .dot{width:14px;height:14px;background:var(--brand);border-radius:50%}
+    .nav a{padding:8px 10px;border-radius:8px}
+    .nav a:hover{background:#f2f2f2}
+    /* Sections */
+    section{padding:64px 0}
+    section.alt{background:var(--bg-alt)}
+    .eyebrow{letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-size:.78rem}
+    h1,h2,h3{line-height:1.2;margin:0 0 16px}
+    h1{font-size:clamp(32px,4.5vw,56px)}
+    h2{font-size:clamp(24px,3vw,36px)}
+    p{margin:0 0 12px}
+    /* Hero */
+    .hero{
+      min-height:72vh;display:grid;place-items:center;position:relative;color:#fff;
+      background:linear-gradient( to bottom, rgba(0,0,0,.35), rgba(0,0,0,.55)),
+                 url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+    }
+    .hero .wrap{max-width:900px;text-align:center;padding:64px 20px}
+    .cta{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+    .btn{display:inline-block;padding:12px 18px;border-radius:999px;font-weight:600;border:2px solid #fff;color:#fff}
+    .btn.primary{background:var(--brand);border-color:var(--brand)}
+    .btn.ghost{background:transparent}
+    /* Grids / cards */
+    .grid{display:grid;gap:var(--gap)}
+    .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media (max-width:900px){ .grid.cols-2,.grid.cols-3{grid-template-columns:1fr} }
+    .card{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+    .kpis{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media (max-width:800px){ .kpis{grid-template-columns:1fr 1fr} }
+    .kpi{background:#fff;border-radius:12px;padding:16px;text-align:center;border:1px solid #eee}
+    .kpi .label{color:var(--muted);font-size:.9rem}
+    .kpi .value{font-size:1.25rem;font-weight:700}
+    /* Timeline */
+    .timeline{display:grid;gap:14px}
+    .step{display:grid;gap:6px;padding:18px;border-left:4px solid var(--brand);background:#fff;border-radius:10px}
+    /* Pricing */
+    .pricing{display:grid;gap:var(--gap)}
+    .pricing .tier{background:#fff;border:1px solid #eee;border-radius:14px;padding:20px}
+    .pricing h3{margin-bottom:8px}
+    /* Footer */
+    footer{padding:32px 0;border-top:1px solid #eee;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero" id="hero" role="banner" aria-label="Hero">
+    <div class="wrap">
+      <div class="eyebrow">Presented by Coca-Cola &amp; A8 Esports</div>
+      <h1>Refresh: Europe — Content Creator Acceler8tor</h1>
+      <p>Empowering new voices in esports to build authentic brand love.</p>
+    </div>
+  </section>
+
+  <!-- Opportunity / Overview -->
+  <section id="overview">
+    <div class="container grid cols-2">
+      <div>
+        <h2>The Opportunity</h2>
+        <p>Esports communities rally around trusted creators. By supporting grassroots talent with real value, brands earn authentic affinity.</p>
+        <div class="kpis" style="margin-top:16px;">
+          <div class="kpi"><div class="label">Target Audience</div><div class="value">Gen Z &amp; Young Adults</div></div>
+          <div class="kpi"><div class="label">Engagement</div><div class="value">Always-on social &amp; streaming</div></div>
+          <div class="kpi"><div class="label">Community</div><div class="value">Creator-led trust</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1200&auto=format&fit=crop" alt="Creator setup placeholder" />
+        <p style="margin-top:10px;color:var(--muted)">Placeholder image — replace with brand asset.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Objectives & Strategy -->
+  <section id="objectives" class="alt">
+    <div class="container">
+      <h2>Objectives & Strategy</h2>
+      <p class="eyebrow" style="margin-bottom:18px;">Build brand love via community, content, and creators.</p>
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>Community</h3>
+          <p>Engage esports audiences at the grassroots level.</p>
+        </div>
+        <div class="card">
+          <h3>Content</h3>
+          <p>Always-on programming that audiences genuinely care about.</p>
+        </div>
+        <div class="card">
+          <h3>Creators</h3>
+          <p>Test &amp; learn across diverse creators to find the best fit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Campaign Overview -->
+  <section id="campaign">
+    <div class="container grid cols-2">
+      <div class="card">
+        <h2>ACTIVATE</h2>
+        <p>Two-day creator conference leveling up craft, growth, and sustainability.</p>
+        <ul>
+          <li>Workshops &amp; keynotes</li>
+          <li>Pro tips &amp; live demos</li>
+          <li>Wellness &amp; community</li>
+        </ul>
+        <p><a href="#activation">See conference details →</a></p>
+      </div>
+      <div class="card">
+        <h2>AMPLIFY</h2>
+        <p>Pre-event media + creator content amplified across channels.</p>
+        <ul>
+          <li>Social &amp; stream integrations</li>
+          <li>UGC hooks</li>
+          <li>Tested creator formats</li>
+        </ul>
+        <p><a href="#amplify">See amplification →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activation Details -->
+  <section id="activation" class="alt">
+    <div class="container">
+      <h2>Activation Details</h2>
+      <div class="grid cols-3" style="margin-top:12px">
+        <div class="card"><strong>What</strong><p>2-day micro-influencer conference (within TwitchCon AMS)</p></div>
+        <div class="card"><strong>Why</strong><p>Grassroots authenticity → brand love</p></div>
+        <div class="card"><strong>When</strong><p>Mid-July (2 days), plus TwitchCon day</p></div>
+        <div class="card"><strong>Who</strong><p>25 diverse micro-influencers (UK &amp; EU)</p></div>
+        <div class="card"><strong>Where</strong><p>Amsterdam: office / show floor / hotel</p></div>
+        <div class="card"><strong>Communities</strong><p>LoL, Rocket League, FIFA, Wild Rift, Variety, Cosplay</p></div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <h3>Conference Themes</h3>
+        <div class="grid cols-3">
+          <div>
+            <h4>Craft</h4>
+            <ul><li>Setup &amp; studio workflow</li><li>Personal brand &amp; style</li><li>Gameplay skill edge</li></ul>
+          </div>
+          <div>
+            <h4>Growth</h4>
+            <ul><li>Platform-specific hacks</li><li>Community engagement</li><li>Access to pros &amp; devs</li></ul>
+          </div>
+          <div>
+            <h4>Sustainability</h4>
+            <ul><li>Mental health habits</li><li>Physical wellness</li><li>Business of content</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Run of Show -->
+  <section id="run-of-show">
+    <div class="container">
+      <h2>Sample Run of Show</h2>
+      <div class="grid cols-2" style="margin-top:16px">
+        <div class="step">
+          <strong>Day 0</strong>
+          <div>Arrivals &amp; informal dinner</div>
+        </div>
+        <div class="step">
+          <strong>Day 1</strong>
+          <div>Welcome, platform tips, craft breakouts, growth sessions, dinner/social</div>
+        </div>
+        <div class="step">
+          <strong>Day 2</strong>
+          <div>Wellness, setup/business tracks, sustainable career panel, TwitchCon time</div>
+        </div>
+        <div class="step">
+          <strong>Day 3</strong>
+          <div>Free day at TwitchCon &amp; departures</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Amplification -->
+  <section id="amplify" class="alt">
+    <div class="container grid cols-2">
+      <div class="card">
+        <h2>TwitchCon Showfloor Pods (Concept)</h2>
+        <p>Branded broadcast pods with light overlays (#BoostedByCoke). Attendees stream on a short delay to featured channels.</p>
+        <p class="eyebrow">Note: Not in current budget; scalable add-on.</p>
+      </div>
+      <div class="card">
+        <h2>Refresh Your Plays</h2>
+        <p>Creator-led segments that teach meta shifts &amp; role transitions; UGC hook for community submissions.</p>
+        <ul><li>4 × :60s videos per creator</li><li>2 × per month</li><li>3-month flight</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Program Timeline -->
+  <section id="timeline">
+    <div class="container">
+      <h2>Program Timeline</h2>
+      <div class="timeline" style="margin-top:12px">
+        <div class="step"><strong>Planning</strong><div>Creator roster &amp; show planning</div></div>
+        <div class="step"><strong>Launch (April)</strong><div>Refresh Your Plays flight begins</div></div>
+        <div class="step"><strong>Conference (May–July)</strong><div>2-day event + TwitchCon</div></div>
+        <div class="step"><strong>Reporting (August)</strong><div>Reach, engagement, brand love, event KPIs</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Measurement -->
+  <section id="measurement" class="alt">
+    <div class="container grid cols-2">
+      <div class="card">
+        <h2>How We Measure Success — Content</h2>
+        <ul>
+          <li>Reach</li>
+          <li>Engagement</li>
+          <li>Brand Love (Affinity + Sentiment)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>How We Measure Success — Event</h2>
+        <ul>
+          <li>Attendance</li>
+          <li>Participation</li>
+          <li>Attendee Feedback</li>
+          <li>Onsite Content Sentiment</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roles -->
+  <section id="roles">
+    <div class="container grid cols-2">
+      <div class="card">
+        <h2>A8 Responsibilities</h2>
+        <ul>
+          <li>Talent &amp; partner management</li>
+          <li>Activation strategy &amp; event production</li>
+          <li>Amplification &amp; community engagement</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Brand Partner</h2>
+        <ul>
+          <li>Brand guidance &amp; approvals</li>
+          <li>Co-marketing &amp; promotion</li>
+          <li>Measurement alignment</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Budget & Scope -->
+  <section id="budget" class="alt">
+    <div class="container">
+      <h2>Budget & Scope</h2>
+      <div class="pricing grid cols-3" style="margin-top:12px">
+        <div class="tier">
+          <h3>Partnership</h3>
+          <p class="eyebrow">$75,000</p>
+          <ul><li>4-month engagement</li><li>Talent &amp; event programming</li><li>Partner management</li></ul>
+        </div>
+        <div class="tier">
+          <h3>Activation</h3>
+          <p class="eyebrow">$100,000</p>
+          <ul><li>T&amp;E, venue, tech, deco</li><li>Speaker fees</li><li>Reporting add-ons</li></ul>
+        </div>
+        <div class="tier">
+          <h3>Refresh Your Plays</h3>
+          <p class="eyebrow">$100,000</p>
+          <ul><li>Talent + video production</li><li>A8 network media</li><li>4M+ impressions est.</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container grid cols-2">
+      <div>
+        <h2>Thank You</h2>
+        <p>By Hive Gaming</p>
+        <p><strong>Steve Buzby</strong> — Founder | Chief Disruption Officer</p>
+        <p><a href="mailto:steve@hivegaming.org">steve@hivegaming.org</a></p>
+      </div>
+      <div class="card">
+        <h3>Assets</h3>
+        <ul id="assets">
+          <li><a href="#">Download one-pager (PDF)</a></li>
+          <li><a href="#">Brand kit</a></li>
+          <li><a href="#">Schedule (CSV)</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <small>© Refresh: Europe — Coca-Cola x A8 Esports</small>
+    </div>
+  </footer>
+</body>
+</html>
+

@@ -1,0 +1,16 @@
+{
+  "sections": [
+    {
+      "type": "Hero",
+      "variant": "imageLeft"
+    },
+    {
+      "type": "Problem",
+      "variant": "detailed"
+    },
+    {
+      "type": "CustomerStories",
+      "variant": "list"
+    }
+  ]
+}
