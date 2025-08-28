@@ -43,13 +43,11 @@ export async function GET(request: NextRequest) {
     if (action === 'references') {
       // Get specific tenant references
       const tenant = searchParams.get('tenant') || 'default';
-      const isDraft = searchParams.get('draft') === 'true';
       
-      const references = await getTenantReferences(tenant, isDraft);
+      const references = await getTenantReferences(tenant);
       return NextResponse.json({
         success: true,
         tenant,
-        isDraft,
         references: references ? {
           id: references.id,
           data: references.data,

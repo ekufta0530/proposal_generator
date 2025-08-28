@@ -21,17 +21,16 @@ create table if not exists memberships (
   primary key (user_id, tenant_id)
 );
 
--- Tenant profiles (branding, layout defaults, etc.)
+-- Tenant profiles (branding, company information, etc.)
 create table if not exists tenant_profiles (
   id uuid primary key default gen_random_uuid(),
   tenant_id text not null references tenants(id) on delete cascade,
   data jsonb not null,
   version text default '1.0.0',
-  is_draft boolean default false,
   created_by uuid references users(id),
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
-  unique(tenant_id, is_draft)
+  unique(tenant_id)
 );
 
 -- Tenant references (customer stories, testimonials, etc.)
@@ -40,11 +39,10 @@ create table if not exists tenant_references (
   tenant_id text not null references tenants(id) on delete cascade,
   data jsonb not null,
   version text default '1.0.0',
-  is_draft boolean default false,
   created_by uuid references users(id),
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
-  unique(tenant_id, is_draft)
+  unique(tenant_id)
 );
 
 -- Proposal layouts (section configurations)
@@ -53,11 +51,10 @@ create table if not exists proposal_layouts (
   tenant_id text not null references tenants(id) on delete cascade,
   data jsonb not null,
   version text default '1.0.0',
-  is_draft boolean default false,
   created_by uuid references users(id),
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
-  unique(tenant_id, is_draft)
+  unique(tenant_id)
 );
 
 -- Proposal content (actual proposal data)
@@ -75,9 +72,9 @@ create table if not exists proposal_content (
 );
 
 -- Indexes for better performance
-create index if not exists idx_tenant_profiles_tenant_draft on tenant_profiles(tenant_id, is_draft);
-create index if not exists idx_tenant_references_tenant_draft on tenant_references(tenant_id, is_draft);
-create index if not exists idx_proposal_layouts_tenant_draft on proposal_layouts(tenant_id, is_draft);
+create index if not exists idx_tenant_profiles_tenant on tenant_profiles(tenant_id);
+create index if not exists idx_tenant_references_tenant on tenant_references(tenant_id);
+create index if not exists idx_proposal_layouts_tenant on proposal_layouts(tenant_id);
 create index if not exists idx_proposal_content_tenant_slug_draft on proposal_content(tenant_id, slug, is_draft);
 create index if not exists idx_proposal_content_tenant_draft on proposal_content(tenant_id, is_draft);
 

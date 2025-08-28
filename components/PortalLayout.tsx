@@ -28,17 +28,21 @@ export default function PortalLayout({ children, title = "Portal" }: PortalLayou
   // Load tenants on component mount
   useEffect(() => {
     async function loadTenants() {
+      console.log('PortalLayout - loading tenants...');
       try {
         const response = await fetch('/api/tenants');
         const data = await response.json();
+        console.log('PortalLayout - tenants API response:', data);
         if (data.success) {
           setTenants(data.tenants || []);
           // Set default tenant if available
           if (data.tenants.length > 0) {
             const savedTenant = localStorage.getItem('selectedTenant');
+            console.log('PortalLayout - savedTenant from localStorage:', savedTenant);
             const defaultTenant = savedTenant && data.tenants.find((t: Tenant) => t.id === savedTenant) 
               ? savedTenant 
               : data.tenants[0].id;
+            console.log('PortalLayout - setting default tenant:', defaultTenant);
             setSelectedTenant(defaultTenant);
           }
         }
@@ -54,6 +58,15 @@ export default function PortalLayout({ children, title = "Portal" }: PortalLayou
   const handleTenantChange = (tenantId: string) => {
     setSelectedTenant(tenantId);
     localStorage.setItem('selectedTenant', tenantId);
+    
+    // Dispatch custom event for same-tab listeners
+    window.dispatchEvent(new CustomEvent('localStorageChange', {
+      detail: {
+        key: 'selectedTenant',
+        newValue: tenantId,
+        oldValue: selectedTenant
+      }
+    }));
   };
 
   return (

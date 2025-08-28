@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     
     if (tenant) {
       // Get specific tenant profile
-      const profileRecord = await getTenantProfile(tenant, false);
+      const profileRecord = await getTenantProfile(tenant);
       
       if (profileRecord) {
         return NextResponse.json({

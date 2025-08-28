@@ -62,6 +62,25 @@ export default function Portal(){
     loadProfile();
   }, [tenant]);
 
+  // Load layout when tenant changes
+  useEffect(() => {
+    async function loadLayout() {
+      if (!tenant) return;
+      
+      try {
+        const response = await fetch(`/api/layout?tenant=${tenant}`);
+        const data = await response.json();
+        if (data.success && data.layout?.data?.sections) {
+          console.log('Portal - loaded layout sections:', data.layout.data.sections);
+          setSections(data.layout.data.sections);
+        }
+      } catch (error) {
+        console.error('Failed to load layout:', error);
+      }
+    }
+    loadLayout();
+  }, [tenant]);
+
   // Load existing proposal data when editing (check URL params)
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -227,7 +246,6 @@ export default function Portal(){
               }}/>
               {currentProfile.branding.colors.primary}
             </span>
-            <span><strong>Brand:</strong> {currentProfile.branding.name}</span>
           </div>
         )}
       </Card>

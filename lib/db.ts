@@ -32,7 +32,6 @@ export interface TenantReferences {
   tenant_id: string;
   data: any;
   version: string;
-  is_draft: boolean;
   created_at: Date;
   updated_at: Date;
 }
@@ -59,68 +58,72 @@ export interface ProposalContent {
 }
 
 // Tenant Profile functions
-export async function getTenantProfile(tenantId: string, isDraft: boolean = false): Promise<TenantProfile | null> {
+export async function getTenantProfile(tenantId: string): Promise<TenantProfile | null> {
   return withTenantContext(tenantId, async () => {
     const { rows } = await pool.query(
-      `SELECT * FROM tenant_profiles WHERE is_draft = $1 ORDER BY updated_at DESC LIMIT 1`,
-      [isDraft]
+      `SELECT * FROM tenant_profiles WHERE tenant_id = $1 ORDER BY updated_at DESC LIMIT 1`,
+      [tenantId]
     );
     return rows[0] || null;
   });
 }
 
-export async function saveTenantProfile(tenantId: string, data: any, isDraft: boolean = false): Promise<TenantProfile> {
+export async function saveTenantProfile(tenantId: string, data: any): Promise<TenantProfile> {
   return withTenantContext(tenantId, async () => {
     const { rows } = await pool.query(
-      `INSERT INTO tenant_profiles (tenant_id, data, is_draft) 
-       VALUES ($1, $2, $3) 
-       ON CONFLICT (tenant_id, is_draft) 
+      `INSERT INTO tenant_profiles (tenant_id, data) 
+       VALUES ($1, $2) 
+       ON CONFLICT (tenant_id) 
        DO UPDATE SET data = $2, updated_at = now() 
        RETURNING *`,
-      [tenantId, data, isDraft]
+      [tenantId, data]
     );
     return rows[0];
   });
 }
 
 // Tenant References functions
-export async function getTenantReferences(tenantId: string, isDraft: boolean = false): Promise<TenantReferences | null> {
-  const { rows } = await pool.query(
-    `SELECT * FROM tenant_references WHERE tenant_id = $1 AND is_draft = $2 ORDER BY updated_at DESC LIMIT 1`,
-    [tenantId, isDraft]
-  );
-  return rows[0] || null;
+export async function getTenantReferences(tenantId: string): Promise<TenantReferences | null> {
+  return withTenantContext(tenantId, async () => {
+    const { rows } = await pool.query(
+      `SELECT * FROM tenant_references WHERE tenant_id = $1 ORDER BY updated_at DESC LIMIT 1`,
+      [tenantId]
+    );
+    return rows[0] || null;
+  });
 }
 
-export async function saveTenantReferences(tenantId: string, data: any, isDraft: boolean = false): Promise<TenantReferences> {
-  const { rows } = await pool.query(
-    `INSERT INTO tenant_references (tenant_id, data, is_draft) 
-     VALUES ($1, $2, $3) 
-     ON CONFLICT (tenant_id, is_draft) 
-     DO UPDATE SET data = $2, updated_at = now() 
-     RETURNING *`,
-    [tenantId, data, isDraft]
-  );
-  return rows[0];
+export async function saveTenantReferences(tenantId: string, data: any): Promise<TenantReferences> {
+  return withTenantContext(tenantId, async () => {
+    const { rows } = await pool.query(
+      `INSERT INTO tenant_references (tenant_id, data) 
+       VALUES ($1, $2) 
+       ON CONFLICT (tenant_id) 
+       DO UPDATE SET data = $2, updated_at = now() 
+       RETURNING *`,
+      [tenantId, data]
+    );
+    return rows[0];
+  });
 }
 
 // Proposal Layout functions
-export async function getProposalLayout(tenantId: string, isDraft: boolean = false): Promise<ProposalLayout | null> {
+export async function getProposalLayout(tenantId: string): Promise<ProposalLayout | null> {
   const { rows } = await pool.query(
-    `SELECT * FROM proposal_layouts WHERE tenant_id = $1 AND is_draft = $2 ORDER BY updated_at DESC LIMIT 1`,
-    [tenantId, isDraft]
+    `SELECT * FROM proposal_layouts WHERE tenant_id = $1 ORDER BY updated_at DESC LIMIT 1`,
+    [tenantId]
   );
   return rows[0] || null;
 }
 
-export async function saveProposalLayout(tenantId: string, data: any, isDraft: boolean = false): Promise<ProposalLayout> {
+export async function saveProposalLayout(tenantId: string, data: any): Promise<ProposalLayout> {
   const { rows } = await pool.query(
-    `INSERT INTO proposal_layouts (tenant_id, data, is_draft) 
-     VALUES ($1, $2, $3) 
-     ON CONFLICT (tenant_id, is_draft) 
+    `INSERT INTO proposal_layouts (tenant_id, data) 
+     VALUES ($1, $2) 
+     ON CONFLICT (tenant_id) 
      DO UPDATE SET data = $2, updated_at = now() 
      RETURNING *`,
-    [tenantId, data, isDraft]
+    [tenantId, data]
   );
   return rows[0];
 }

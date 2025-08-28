@@ -1,5 +1,5 @@
 -- Complete Seed File for Proposals Platform
--- This file sets up the A8 Esports tenant and Coca-Cola proposal
+-- This file sets up the A8 Esports tenant
 
 -- ========================================
 -- 1. INSERT TENANTS
@@ -9,16 +9,12 @@
 INSERT INTO tenants (id, name) VALUES ('a8-esports', 'A8 Esports') 
 ON CONFLICT (id) DO NOTHING;
 
--- Insert Coca-Cola tenant  
-INSERT INTO tenants (id, name) VALUES ('coca-cola', 'A8 Esports') 
-ON CONFLICT (id) DO NOTHING;
-
 -- ========================================
 -- 2. INSERT TENANT PROFILES
 -- ========================================
 
--- A8 Esports Profile (Live)
-INSERT INTO tenant_profiles (tenant_id, data, is_draft) VALUES (
+-- A8 Esports Profile
+INSERT INTO tenant_profiles (tenant_id, data) VALUES (
   'a8-esports',
   '{
     "branding": {
@@ -31,78 +27,19 @@ INSERT INTO tenant_profiles (tenant_id, data, is_draft) VALUES (
       }
     },
     "templateVersion": "1.0.0"
-  }',
-  false
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
+  }'
+) ON CONFLICT (tenant_id) DO UPDATE SET 
   data = EXCLUDED.data,
   updated_at = now();
 
--- A8 Esports Profile (Draft)
-INSERT INTO tenant_profiles (tenant_id, data, is_draft) VALUES (
-  'a8-esports',
-  '{
-    "branding": {
-      "name": "A8 Esports", 
-      "colors": {
-        "primary": "#e10600",
-        "secondary": "#000000",
-        "background": "#ffffff",
-        "text": "#000000"
-      }
-    },
-    "templateVersion": "1.0.0"
-  }',
-  true
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
 
--- Coca-Cola Profile (Live)
-INSERT INTO tenant_profiles (tenant_id, data, is_draft) VALUES (
-  'coca-cola',
-  '{
-    "branding": {
-      "name": "A8 Esports",
-      "colors": {
-        "primary": "#e10600",
-        "secondary": "#000000", 
-        "background": "#ffffff",
-        "text": "#000000"
-      }
-    },
-    "templateVersion": "1.0.0"
-  }',
-  false
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
-
--- Coca-Cola Profile (Draft)
-INSERT INTO tenant_profiles (tenant_id, data, is_draft) VALUES (
-  'coca-cola',
-  '{
-    "branding": {
-      "name": "A8 Esports",
-      "colors": {
-        "primary": "#e10600",
-        "secondary": "#000000",
-        "background": "#ffffff", 
-        "text": "#000000"
-      }
-    },
-    "templateVersion": "1.0.0"
-  }',
-  true
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
 
 -- ========================================
 -- 3. INSERT TENANT REFERENCES
 -- ========================================
 
--- A8 Esports References (Live)
-INSERT INTO tenant_references (tenant_id, data, is_draft) VALUES (
+-- A8 Esports References
+INSERT INTO tenant_references (tenant_id, data) VALUES (
   'a8-esports',
   '{
     "templateVersion": "1.0.0",
@@ -121,96 +58,19 @@ INSERT INTO tenant_references (tenant_id, data, is_draft) VALUES (
     "collections": {
       "default": ["ref-a8-1", "ref-a8-2"]
     }
-  }',
-  false
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
+  }'
+) ON CONFLICT (tenant_id) DO UPDATE SET 
   data = EXCLUDED.data,
   updated_at = now();
 
--- A8 Esports References (Draft)
-INSERT INTO tenant_references (tenant_id, data, is_draft) VALUES (
-  'a8-esports',
-  '{
-    "templateVersion": "1.0.0",
-    "references": [
-      {
-        "id": "ref-a8-1",
-        "title": "Esports Partnership Success", 
-        "quote": "A8 Esports delivered exceptional results for our brand partnership."
-      },
-      {
-        "id": "ref-a8-2",
-        "title": "Community Engagement",
-        "quote": "Their community-first approach created authentic connections."
-      }
-    ],
-    "collections": {
-      "default": ["ref-a8-1", "ref-a8-2"]
-    }
-  }',
-  true
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
 
--- Coca-Cola References (Live)
-INSERT INTO tenant_references (tenant_id, data, is_draft) VALUES (
-  'coca-cola',
-  '{
-    "templateVersion": "1.0.0",
-    "references": [
-      {
-        "id": "ref-coke-1",
-        "title": "Refresh: Europe Success",
-        "quote": "The Content Creator Acceler8tor program exceeded all expectations."
-      },
-      {
-        "id": "ref-coke-2",
-        "title": "Brand Love Growth",
-        "quote": "Authentic creator partnerships drove significant brand affinity."
-      }
-    ],
-    "collections": {
-      "default": ["ref-coke-1", "ref-coke-2"]
-    }
-  }',
-  false
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
-
--- Coca-Cola References (Draft)
-INSERT INTO tenant_references (tenant_id, data, is_draft) VALUES (
-  'coca-cola',
-  '{
-    "templateVersion": "1.0.0",
-    "references": [
-      {
-        "id": "ref-coke-1",
-        "title": "Refresh: Europe Success",
-        "quote": "The Content Creator Acceler8tor program exceeded all expectations."
-      },
-      {
-        "id": "ref-coke-2",
-        "title": "Brand Love Growth", 
-        "quote": "Authentic creator partnerships drove significant brand affinity."
-      }
-    ],
-    "collections": {
-      "default": ["ref-coke-1", "ref-coke-2"]
-    }
-  }',
-  true
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
 
 -- ========================================
 -- 4. INSERT PROPOSAL LAYOUTS
 -- ========================================
 
--- A8 Esports Layout (Live)
-INSERT INTO proposal_layouts (tenant_id, data, is_draft) VALUES (
+-- A8 Esports Layout
+INSERT INTO proposal_layouts (tenant_id, data) VALUES (
   'a8-esports',
   '{
     "sections": [
@@ -226,78 +86,8 @@ INSERT INTO proposal_layouts (tenant_id, data, is_draft) VALUES (
       { "type": "Budget", "variant": "pricing", "enabled": true },
       { "type": "Contact", "variant": "info", "enabled": true }
     ]
-  }',
-  false
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
-
--- A8 Esports Layout (Draft)
-INSERT INTO proposal_layouts (tenant_id, data, is_draft) VALUES (
-  'a8-esports',
-  '{
-    "sections": [
-      { "type": "Hero", "variant": "backgroundImg", "enabled": true },
-      { "type": "Overview", "variant": "opportunity", "enabled": true },
-      { "type": "Objectives", "variant": "strategy", "enabled": true },
-      { "type": "Campaign", "variant": "overview", "enabled": true },
-      { "type": "Activation", "variant": "details", "enabled": true },
-      { "type": "Timeline", "variant": "steps", "enabled": true },
-      { "type": "Amplification", "variant": "content", "enabled": true },
-      { "type": "Measurement", "variant": "success", "enabled": true },
-      { "type": "Roles", "variant": "responsibilities", "enabled": true },
-      { "type": "Budget", "variant": "pricing", "enabled": true },
-      { "type": "Contact", "variant": "info", "enabled": true }
-    ]
-  }',
-  true
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
-
--- Coca-Cola Layout (Live)
-INSERT INTO proposal_layouts (tenant_id, data, is_draft) VALUES (
-  'coca-cola',
-  '{
-    "sections": [
-      { "type": "Hero", "variant": "backgroundImg", "enabled": true },
-      { "type": "Overview", "variant": "opportunity", "enabled": true },
-      { "type": "Objectives", "variant": "strategy", "enabled": true },
-      { "type": "Campaign", "variant": "overview", "enabled": true },
-      { "type": "Activation", "variant": "details", "enabled": true },
-      { "type": "Timeline", "variant": "steps", "enabled": true },
-      { "type": "Amplification", "variant": "content", "enabled": true },
-      { "type": "Measurement", "variant": "success", "enabled": true },
-      { "type": "Roles", "variant": "responsibilities", "enabled": true },
-      { "type": "Budget", "variant": "pricing", "enabled": true },
-      { "type": "Contact", "variant": "info", "enabled": true }
-    ]
-  }',
-  false
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
-
--- Coca-Cola Layout (Draft)
-INSERT INTO proposal_layouts (tenant_id, data, is_draft) VALUES (
-  'coca-cola',
-  '{
-    "sections": [
-      { "type": "Hero", "variant": "backgroundImg", "enabled": true },
-      { "type": "Overview", "variant": "opportunity", "enabled": true },
-      { "type": "Objectives", "variant": "strategy", "enabled": true },
-      { "type": "Campaign", "variant": "overview", "enabled": true },
-      { "type": "Activation", "variant": "details", "enabled": true },
-      { "type": "Timeline", "variant": "steps", "enabled": true },
-      { "type": "Amplification", "variant": "content", "enabled": true },
-      { "type": "Measurement", "variant": "success", "enabled": true },
-      { "type": "Roles", "variant": "responsibilities", "enabled": true },
-      { "type": "Budget", "variant": "pricing", "enabled": true },
-      { "type": "Contact", "variant": "info", "enabled": true }
-    ]
-  }',
-  true
-) ON CONFLICT (tenant_id, is_draft) DO UPDATE SET 
+  }'
+) ON CONFLICT (tenant_id) DO UPDATE SET 
   data = EXCLUDED.data,
   updated_at = now();
 
@@ -305,9 +95,9 @@ INSERT INTO proposal_layouts (tenant_id, data, is_draft) VALUES (
 -- 5. INSERT PROPOSAL CONTENT
 -- ========================================
 
--- Coca-Cola Refresh Europe Proposal (Live)
+-- A8 Esports Sample Proposal (Live)
 INSERT INTO proposal_content (tenant_id, slug, data, is_draft) VALUES (
-  'coca-cola',
+  'a8-esports',
   'refresh-europe',
   '{
     "Hero": {
@@ -544,46 +334,12 @@ INSERT INTO proposal_content (tenant_id, slug, data, is_draft) VALUES (
           "url": "#"
         }
       ]
+    },
+    "CustomerStories": {
+      "useCollection": "default"
     }
   }',
   false
-) ON CONFLICT (tenant_id, slug, is_draft) DO UPDATE SET 
-  data = EXCLUDED.data,
-  updated_at = now();
-
--- Coca-Cola Refresh Europe Proposal (Draft)
-INSERT INTO proposal_content (tenant_id, slug, data, is_draft) VALUES (
-  'coca-cola',
-  'refresh-europe',
-  '{
-    "Hero": {
-      "eyebrow": "Presented by Coca-Cola & A8 Esports",
-      "title": "Refresh: Europe — Content Creator Acceler8tor",
-      "subtitle": "Empowering new voices in esports to build authentic brand love.",
-      "backgroundImage": "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1600&auto=format&fit=crop"
-    },
-    "Overview": {
-      "title": "The Opportunity",
-      "description": "Esports communities rally around trusted creators. By supporting grassroots talent with real value, brands earn authentic affinity.",
-      "kpis": [
-        {
-          "label": "Target Audience",
-          "value": "Gen Z & Young Adults"
-        },
-        {
-          "label": "Engagement",
-          "value": "Always-on social & streaming"
-        },
-        {
-          "label": "Community",
-          "value": "Creator-led trust"
-        }
-      ],
-      "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1200&auto=format&fit=crop",
-      "imageAlt": "Creator setup placeholder"
-    }
-  }',
-  true
 ) ON CONFLICT (tenant_id, slug, is_draft) DO UPDATE SET 
   data = EXCLUDED.data,
   updated_at = now();

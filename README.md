@@ -54,7 +54,6 @@ npm run dev
 
 - **Portal (Editor)**: http://localhost:3000/portal
 - **pgAdmin**: http://localhost:5050 (admin@admin.com / admin)
-- **Coca-Cola Proposal**: http://localhost:3000/proposal/refresh-europe
 
 ## Database Schema
 
@@ -71,9 +70,9 @@ users (id, email, created_at)
 memberships (user_id, tenant_id, role)
 
 -- Tenant data (JSONB)
-tenant_profiles (tenant_id, data, is_draft, created_at, updated_at)
-tenant_references (tenant_id, data, is_draft, created_at, updated_at)
-proposal_layouts (tenant_id, data, is_draft, created_at, updated_at)
+tenant_profiles (tenant_id, data, created_at, updated_at)
+tenant_references (tenant_id, data, created_at, updated_at)
+proposal_layouts (tenant_id, data, created_at, updated_at)
 proposal_content (tenant_id, slug, data, is_draft, created_at, updated_at)
 ```
 
@@ -88,9 +87,11 @@ Each tenant's data includes:
 
 ### Draft vs Live Separation
 
-Each table supports draft/live separation with `is_draft` boolean:
+Some tables support draft/live separation with `is_draft` boolean:
 - **Draft data** (`is_draft = true`): Work-in-progress content
 - **Live data** (`is_draft = false`): Published, publicly accessible content
+
+**Note**: Tenant profiles, proposal layouts, and tenant references do not have draft functionality since they represent company branding, structure, and customer stories that don't change frequently.
 
 ## Data Flow
 

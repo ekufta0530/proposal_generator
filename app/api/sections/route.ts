@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Save references if provided
     if (proposal?.references) {
-      const referencesResult = await saveTenantReferences(tenant, proposal.references, isDraft);
+      const referencesResult = await saveTenantReferences(tenant, proposal.references);
       results.push({ type: 'references', id: referencesResult.id });
     }
     

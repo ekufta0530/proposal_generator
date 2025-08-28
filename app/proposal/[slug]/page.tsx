@@ -38,38 +38,16 @@ export default async function ProposalPage({
 
   // 1) Profile & references
   let profileRaw:any, referencesRaw:any;
-  if (draft) {
-    // For drafts: Database first, fallback to local
-    try { 
-      const profileRecord = await getTenantProfile(tenant, true);
-      if (profileRecord) {
-        profileRaw = profileRecord.data;
-      } else {
-        throw new Error('No draft profile in database');
-      }
-    } catch { 
-      profileRaw = await localJson(`/seed/tenants/${tenant}/profile.json`).catch(()=>localJson(`/seed/tenants/default/profile.json`)); 
-    }
-    try { 
-      const referencesRecord = await getTenantReferences(tenant, true);
-      if (referencesRecord) {
-        referencesRaw = referencesRecord.data;
-      } else {
-        throw new Error('No draft references in database');
-      }
-    } catch { 
-      referencesRaw = await localJson(`/seed/tenants/${tenant}/references.json`).catch(()=>localJson(`/seed/tenants/default/references.json`)); 
-    }
-  } else {
-    // For live: Database only, no fallbacks
-    const profileRecord = await getTenantProfile(tenant, false);
-    if (!profileRecord) throw new Error(`No live profile found for tenant: ${tenant}`);
-    profileRaw = profileRecord.data;
-    
-    const referencesRecord = await getTenantReferences(tenant, false);
-    if (!referencesRecord) throw new Error(`No live references found for tenant: ${tenant}`);
-    referencesRaw = referencesRecord.data;
-  }
+  
+  // Profile is always the same (no draft functionality)
+  const profileRecord = await getTenantProfile(tenant);
+  if (!profileRecord) throw new Error(`No profile found for tenant: ${tenant}`);
+  profileRaw = profileRecord.data;
+  
+  // References are always the same (no draft functionality)
+  const referencesRecord = await getTenantReferences(tenant);
+  if (!referencesRecord) throw new Error(`No references found for tenant: ${tenant}`);
+  referencesRaw = referencesRecord.data;
   const profile = ProfileSchema.parse(profileRaw);
   
   // Handle incomplete references data by providing defaults
@@ -82,17 +60,11 @@ export default async function ProposalPage({
 
   // 2) Layout
   let layoutRaw:any = null;
-  if (draft) {
-    // For drafts: Database only
-    const layoutRecord = await getProposalLayout(tenant, true);
-    if (!layoutRecord) throw new Error(`No draft layout found for tenant: ${tenant}`);
-    layoutRaw = layoutRecord.data;
-  } else {
-    // For live: Database only, no fallbacks
-    const layoutRecord = await getProposalLayout(tenant, false);
-    if (!layoutRecord) throw new Error(`No live layout found for tenant: ${tenant}`);
-    layoutRaw = layoutRecord.data;
-  }
+  
+  // Layout is always the same (no draft functionality)
+  const layoutRecord = await getProposalLayout(tenant);
+  if (!layoutRecord) throw new Error(`No layout found for tenant: ${tenant}`);
+  layoutRaw = layoutRecord.data;
   const layout = LayoutSchema.parse(layoutRaw);
 
   // 3) Content
