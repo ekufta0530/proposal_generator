@@ -28,7 +28,6 @@ export const ProfileSchema = z.object({
       text: z.string()
     })
   }),
-  layoutDefaults: LayoutSchema.optional(),
   flags: z.record(z.boolean()).optional()
 });
 

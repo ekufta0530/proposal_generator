@@ -16,7 +16,7 @@ import { Button, Input, Select, Card, StatusMessage } from "@/components/ui/Port
  */
 type SectionChoice = { type: string; variant: string; enabled?: boolean; props?: Record<string,any> };
 type Tenant = { id: string; name: string; colors: { primary: string } };
-type Profile = { branding: { name: string; colors: { primary: string } }; layoutDefaults?: { sections: SectionChoice[] } };
+type Profile = { branding: { name: string; colors: { primary: string } } };
 
 export default function Portal(){
   const [tenant,setTenant]=useState(() => {
@@ -52,10 +52,6 @@ export default function Portal(){
         const data = await response.json();
         if (data.success) {
           setCurrentProfile(data.profile);
-          // Update sections with profile defaults if available
-          if (data.profile.layoutDefaults?.sections) {
-            setSections(data.profile.layoutDefaults.sections);
-          }
         }
       } catch (error) {
         console.error('Failed to load profile:', error);
@@ -231,7 +227,7 @@ export default function Portal(){
               }}/>
               {currentProfile.branding.colors.primary}
             </span>
-            <span><strong>Default Sections:</strong> {currentProfile.layoutDefaults?.sections?.length || 0}</span>
+            <span><strong>Brand:</strong> {currentProfile.branding.name}</span>
           </div>
         )}
       </Card>

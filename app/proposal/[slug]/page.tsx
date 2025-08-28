@@ -12,16 +12,7 @@ import {
   findTenantForProposal
 } from "@/lib/db";
 
-/** Helper to fetch local JSON with no cache (for seeds) */
-async function localJson(path: string) {
-  // Make sure we have a proper URL
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const fullUrl = path.startsWith('http') ? path : `${baseUrl}${path}`;
-  
-  const r = await fetch(fullUrl, { cache: "no-store" });
-  if (!r.ok) throw new Error(`Failed ${path}`);
-  return r.json();
-}
+
 
 export default async function ProposalPage({
   params, searchParams
@@ -92,17 +83,10 @@ export default async function ProposalPage({
   // 2) Layout
   let layoutRaw:any = null;
   if (draft) {
-    // For drafts: Database -> profile.layoutDefaults -> local
-    try { 
-      const layoutRecord = await getProposalLayout(tenant, true);
-      if (layoutRecord) {
-        layoutRaw = layoutRecord.data;
-      }
-    } catch {}
-    if (!layoutRaw && profile.layoutDefaults) layoutRaw = profile.layoutDefaults;
-    if (!layoutRaw) {
-      layoutRaw = await localJson(`/seed/layouts/${tenant}.json`).catch(()=>localJson(`/seed/layouts/default.json`));
-    }
+    // For drafts: Database only
+    const layoutRecord = await getProposalLayout(tenant, true);
+    if (!layoutRecord) throw new Error(`No draft layout found for tenant: ${tenant}`);
+    layoutRaw = layoutRecord.data;
   } else {
     // For live: Database only, no fallbacks
     const layoutRecord = await getProposalLayout(tenant, false);

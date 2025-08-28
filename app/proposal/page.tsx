@@ -25,7 +25,7 @@ export default async function ProposalIndex(){
         <h2>Brand Information</h2>
         <p>Brand: <strong>{parsed.branding.name}</strong></p>
         <p>Primary color: <span style={{display:'inline-block',width:12,height:12,background:parsed.branding.colors.primary,verticalAlign:'middle',marginRight:6}}/> {parsed.branding.colors.primary}</p>
-        <p>Default sections: {parsed.layoutDefaults?.sections?.length ?? 0}</p>
+        <p>Brand: {parsed.branding.name}</p>
       </div>
 
       <div style={{ marginBottom: 24 }}>

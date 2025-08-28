@@ -4,3 +4,4 @@ out
 .vercel
 pgdata
 .DS_Store
+.env.local
