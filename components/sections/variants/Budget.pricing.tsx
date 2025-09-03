@@ -25,7 +25,7 @@ export default function BudgetPricing({
           lineHeight: 1.2, 
           margin: '0 0 16px' 
         }}>
-          {title || 'Budget & Scope'}
+          {title || '[Budget Title - Please fill in]'}
         </h2>
         <div style={{ 
           display: 'grid', 
@@ -35,22 +35,22 @@ export default function BudgetPricing({
         }}>
           {(tiers || [
             {
-              title: 'Partnership',
-              price: '$75,000',
-              description: '4-month engagement',
-              bullets: ['4-month engagement', 'Talent & event programming', 'Partner management']
+              title: 'Tier 1',
+              price: '[Price - Please fill in]',
+              description: '[Tier 1 description - Please fill in]',
+              bullets: ['[Bullet 1 - Please fill in]', '[Bullet 2 - Please fill in]', '[Bullet 3 - Please fill in]']
             },
             {
-              title: 'Activation',
-              price: '$100,000',
-              description: 'T&E, venue, tech, deco',
-              bullets: ['T&E, venue, tech, deco', 'Speaker fees', 'Reporting add-ons']
+              title: 'Tier 2',
+              price: '[Price - Please fill in]',
+              description: '[Tier 2 description - Please fill in]',
+              bullets: ['[Bullet 1 - Please fill in]', '[Bullet 2 - Please fill in]', '[Bullet 3 - Please fill in]']
             },
             {
-              title: 'Refresh Your Plays',
-              price: '$100,000',
-              description: 'Talent + video production',
-              bullets: ['Talent + video production', 'A8 network media', '4M+ impressions est.']
+              title: 'Tier 3',
+              price: '[Price - Please fill in]',
+              description: '[Tier 3 description - Please fill in]',
+              bullets: ['[Bullet 1 - Please fill in]', '[Bullet 2 - Please fill in]', '[Bullet 3 - Please fill in]']
             }
           ]).map((tier, index) => (
             <div key={index} style={{

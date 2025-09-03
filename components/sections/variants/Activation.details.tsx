@@ -22,7 +22,7 @@ export default function ActivationDetails({
           lineHeight: 1.2, 
           margin: '0 0 16px' 
         }}>
-          {title || 'Activation Details'}
+          {title || '[Activation Title - Please fill in]'}
         </h2>
         <div style={{ 
           display: 'grid', 
@@ -31,12 +31,12 @@ export default function ActivationDetails({
           marginTop: '12px'
         }}>
           {(details || [
-            { label: 'What', value: '2-day micro-influencer conference (within TwitchCon AMS)' },
-            { label: 'Why', value: 'Grassroots authenticity → brand love' },
-            { label: 'When', value: 'Mid-July (2 days), plus TwitchCon day' },
-            { label: 'Who', value: '25 diverse micro-influencers (UK & EU)' },
-            { label: 'Where', value: 'Amsterdam: office / show floor / hotel' },
-            { label: 'Communities', value: 'LoL, Rocket League, FIFA, Wild Rift, Variety, Cosplay' }
+            { label: 'What', value: '[What - Please fill in]' },
+            { label: 'Why', value: '[Why - Please fill in]' },
+            { label: 'When', value: '[When - Please fill in]' },
+            { label: 'Who', value: '[Who - Please fill in]' },
+            { label: 'Where', value: '[Where - Please fill in]' },
+            { label: 'Communities', value: '[Communities - Please fill in]' }
           ]).map((detail, index) => (
             <div key={index} style={{
               background: '#fff',

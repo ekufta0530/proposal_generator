@@ -30,13 +30,13 @@ export default function RolesResponsibilities({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {leftTitle || 'A8 Responsibilities'}
+            {leftTitle || '[Left Role Title - Please fill in]'}
           </h2>
           <ul style={{ margin: '0', paddingLeft: '20px' }}>
             {(leftBullets || [
-              'Talent & partner management',
-              'Activation strategy & event production',
-              'Amplification & community engagement'
+              '[Left responsibility 1 - Please fill in]',
+              '[Left responsibility 2 - Please fill in]',
+              '[Left responsibility 3 - Please fill in]'
             ]).map((bullet, index) => (
               <li key={index} style={{ marginBottom: '8px' }}>{bullet}</li>
             ))}
@@ -53,13 +53,13 @@ export default function RolesResponsibilities({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {rightTitle || 'Brand Partner'}
+            {rightTitle || '[Right Role Title - Please fill in]'}
           </h2>
           <ul style={{ margin: '0', paddingLeft: '20px' }}>
             {(rightBullets || [
-              'Brand guidance & approvals',
-              'Co-marketing & promotion',
-              'Measurement alignment'
+              '[Right responsibility 1 - Please fill in]',
+              '[Right responsibility 2 - Please fill in]',
+              '[Right responsibility 3 - Please fill in]'
             ]).map((bullet, index) => (
               <li key={index} style={{ marginBottom: '8px' }}>{bullet}</li>
             ))}

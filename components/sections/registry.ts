@@ -82,9 +82,9 @@ export const metadata = {
           { kind: "string", name: "ctaLink", label: "CTA Button Link" }
         ],
         defaults: { 
-          eyebrow: "Presented by Coca-Cola & A8 Esports",
-          title: "Refresh: Europe — Content Creator Acceler8tor",
-          subtitle: "Empowering new voices in esports to build authentic brand love."
+          eyebrow: "Eyebrow text goes here",
+          title: "Hero title goes here",
+          subtitle: "Hero subtitle goes here"
         }
       }
     ]

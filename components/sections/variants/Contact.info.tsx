@@ -29,16 +29,16 @@ export default function ContactInfo({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {title || 'Thank You'}
+            {title || '[Contact Title - Please fill in]'}
           </h2>
-          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
-            By {company || 'Hive Gaming'}
+          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
+            By {company || '[Company Name - Please fill in]'}
           </p>
-          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
-            <strong>{contactName || 'Steve Buzby'}</strong> — {contactTitle || 'Founder | Chief Disruption Officer'}
+          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
+            <strong>{contactName || '[Contact Name - Please fill in]'}</strong> — {contactTitle || '[Contact Title - Please fill in]'}
           </p>
           {contactEmail && (
-            <p style={{ margin: '0', fontSize: '16px', lineHeight: 1.5 }}>
+            <p style={{ margin: '0', fontSize: '16px', lineHeight: '1.5' }}>
               <a href={`mailto:${contactEmail}`} style={{ color: '#e10600', textDecoration: 'none' }}>
                 {contactEmail}
               </a>
@@ -60,9 +60,9 @@ export default function ContactInfo({
           </h3>
           <ul style={{ margin: '0', paddingLeft: '20px' }}>
             {(assets || [
-              { label: 'Download one-pager (PDF)', url: '#' },
-              { label: 'Brand kit', url: '#' },
-              { label: 'Schedule (CSV)', url: '#' }
+              { label: '[Asset 1 - Please fill in]', url: '#' },
+              { label: '[Asset 2 - Please fill in]', url: '#' },
+              { label: '[Asset 3 - Please fill in]', url: '#' }
             ]).map((asset, index) => (
               <li key={index} style={{ marginBottom: '8px' }}>
                 <a href={asset.url} style={{ color: '#e10600', textDecoration: 'none' }}>

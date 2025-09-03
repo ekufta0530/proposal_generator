@@ -215,7 +215,44 @@ export async function findTenantForProposal(slug: string): Promise<string | null
   return rows[0]?.tenant_id || null;
 }
 
+// Delete proposal function
+export async function deleteProposal(tenantId: string, slug: string, isDraft: boolean = false): Promise<boolean> {
+  return withTenantContext(tenantId, async (client) => {
+    const { rowCount } = await client.query(
+      `DELETE FROM proposal_content WHERE tenant_id = $1 AND slug = $2 AND is_draft = $3`,
+      [tenantId, slug, isDraft]
+    );
+    return rowCount > 0;
+  });
+}
 
+// Bulk delete proposals function
+export async function deleteMultipleProposals(tenantId: string, proposals: Array<{slug: string, isDraft: boolean}>): Promise<{success: boolean, deleted: number, errors: string[]}> {
+  return withTenantContext(tenantId, async (client) => {
+    const errors: string[] = [];
+    let deleted = 0;
+    
+    for (const proposal of proposals) {
+      try {
+        const { rowCount } = await client.query(
+          `DELETE FROM proposal_content WHERE tenant_id = $1 AND slug = $2 AND is_draft = $3`,
+          [tenantId, proposal.slug, proposal.isDraft]
+        );
+        if (rowCount > 0) {
+          deleted++;
+        }
+      } catch (error: any) {
+        errors.push(`Failed to delete ${proposal.slug}: ${error.message}`);
+      }
+    }
+    
+    return {
+      success: errors.length === 0,
+      deleted,
+      errors
+    };
+  });
+}
 
 // Database health check
 export async function testDatabaseConnection(): Promise<{success: boolean, message: string}> {

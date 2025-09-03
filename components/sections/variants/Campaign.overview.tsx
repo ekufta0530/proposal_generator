@@ -38,10 +38,10 @@ export default function CampaignOverview({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {activateTitle || 'ACTIVATE'}
+            {activateTitle || '[Activate Title - Please fill in]'}
           </h2>
-          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
-            {activateDescription || 'Two-day creator conference leveling up craft, growth, and sustainability.'}
+          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
+            {activateDescription || '[Activate description goes here - Please fill in]'}
           </p>
           {activateBullets && activateBullets.length > 0 && (
             <ul style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
@@ -69,10 +69,10 @@ export default function CampaignOverview({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {amplifyTitle || 'AMPLIFY'}
+            {amplifyTitle || '[Amplify Title - Please fill in]'}
           </h2>
-          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
-            {amplifyDescription || 'Pre-event media + creator content amplified across channels.'}
+          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
+            {amplifyDescription || '[Amplify description goes here - Please fill in]'}
           </p>
           {amplifyBullets && amplifyBullets.length > 0 && (
             <ul style={{ margin: '0 0 12px', paddingLeft: '20px' }}>

@@ -22,7 +22,7 @@ export default function ObjectivesStrategy({
           lineHeight: 1.2, 
           margin: '0 0 16px' 
         }}>
-          {title || 'Objectives & Strategy'}
+          {title || '[Objectives Title - Please fill in]'}
         </h2>
         {subtitle && (
           <p style={{ 
@@ -41,9 +41,9 @@ export default function ObjectivesStrategy({
           gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' 
         }}>
           {(objectives || [
-            { title: 'Community', description: 'Engage esports audiences at the grassroots level.' },
-            { title: 'Content', description: 'Always-on programming that audiences genuinely care about.' },
-            { title: 'Creators', description: 'Test & learn across diverse creators to find the best fit.' }
+            { title: 'Objective 1', description: '[Objective 1 description - Please fill in]' },
+            { title: 'Objective 2', description: '[Objective 2 description - Please fill in]' },
+            { title: 'Objective 3', description: '[Objective 3 description - Please fill in]' }
           ]).map((objective, index) => (
             <div key={index} style={{
               background: '#fff',
@@ -58,7 +58,7 @@ export default function ObjectivesStrategy({
               }}>
                 {objective.title}
               </h3>
-              <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
+              <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
                 {objective.description}
               </p>
             </div>

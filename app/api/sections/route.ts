@@ -3,7 +3,9 @@ import {
   saveTenantProfile, 
   saveTenantReferences, 
   saveProposalLayout, 
-  saveProposalContent 
+  saveProposalContent,
+  deleteProposal,
+  deleteMultipleProposals
 } from '@/lib/db';
 import { metadata } from "@/components/sections/registry";
 
@@ -58,6 +60,76 @@ export async function POST(request: NextRequest) {
       { 
         success: false,
         error: 'Failed to save to database',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const tenant = searchParams.get('tenant');
+    const slug = searchParams.get('slug');
+    const isDraft = searchParams.get('isDraft') === 'true';
+    
+    if (!tenant) {
+      return NextResponse.json(
+        { error: 'Missing required parameter: tenant' },
+        { status: 400 }
+      );
+    }
+
+    // Check if this is a bulk delete request
+    const body = await request.json().catch(() => null);
+    
+    if (body && body.proposals && Array.isArray(body.proposals)) {
+      // Bulk delete
+      const result = await deleteMultipleProposals(tenant, body.proposals);
+      
+      if (result.success) {
+        return NextResponse.json({
+          success: true,
+          message: `Successfully deleted ${result.deleted} proposals`,
+          deleted: result.deleted
+        });
+      } else {
+        return NextResponse.json({
+          success: false,
+          message: `Deleted ${result.deleted} proposals with some errors`,
+          deleted: result.deleted,
+          errors: result.errors
+        }, { status: 207 }); // 207 Multi-Status
+      }
+    } else if (slug) {
+      // Single delete
+      const deleted = await deleteProposal(tenant, slug, isDraft);
+      
+      if (deleted) {
+        return NextResponse.json({
+          success: true,
+          message: `Successfully deleted proposal: ${slug}`
+        });
+      } else {
+        return NextResponse.json(
+          { error: `Proposal not found: ${slug}` },
+          { status: 404 }
+        );
+      }
+    } else {
+      return NextResponse.json(
+        { error: 'Missing required parameter: slug or proposals array' },
+        { status: 400 }
+      );
+    }
+    
+  } catch (error: any) {
+    console.error('Failed to delete proposal:', error);
+    return NextResponse.json(
+      { 
+        success: false,
+        error: 'Failed to delete proposal',
         details: error.message 
       },
       { status: 500 }

@@ -17,7 +17,7 @@ export default function TimelineSteps({
           lineHeight: 1.2, 
           margin: '0 0 16px' 
         }}>
-          {title || 'Program Timeline'}
+          {title || '[Timeline Title - Please fill in]'}
         </h2>
         <div style={{ 
           display: 'grid', 
@@ -25,10 +25,10 @@ export default function TimelineSteps({
           marginTop: '12px'
         }}>
           {(steps || [
-            { title: 'Planning', description: 'Creator roster & show planning' },
-            { title: 'Launch (April)', description: 'Refresh Your Plays flight begins' },
-            { title: 'Conference (May–July)', description: '2-day event + TwitchCon' },
-            { title: 'Reporting (August)', description: 'Reach, engagement, brand love, event KPIs' }
+            { title: 'Step 1', description: '[Step 1 description - Please fill in]' },
+            { title: 'Step 2', description: '[Step 2 description - Please fill in]' },
+            { title: 'Step 3', description: '[Step 3 description - Please fill in]' },
+            { title: 'Step 4', description: '[Step 4 description - Please fill in]' }
           ]).map((step, index) => (
             <div key={index} style={{
               display: 'grid',
@@ -42,7 +42,7 @@ export default function TimelineSteps({
               <strong style={{ fontSize: '16px', fontWeight: 600 }}>
                 {step.title}
               </strong>
-              <div style={{ fontSize: '16px', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '16px', lineHeight: '1.5' }}>
                 {step.description}
               </div>
             </div>

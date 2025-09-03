@@ -43,7 +43,7 @@ export default function HeroBackgroundImg({
           margin: '0 0 16px',
           color: '#fff'
         }}>
-          {title || 'Hero Title'}
+          {title || '[Hero Title - Please fill in]'}
         </h1>
         {subtitle && (
           <p style={{ margin: '0 0 12px', fontSize: '18px' }}>

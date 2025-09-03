@@ -27,10 +27,10 @@ export default function OverviewOpportunity({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {title || 'The Opportunity'}
+            {title || '[Overview Title - Please fill in]'}
           </h2>
-          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
-            {description || 'Description of the opportunity goes here.'}
+          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
+            {description || '[Overview description goes here - Please fill in]'}
           </p>
           {kpis && kpis.length > 0 && (
             <div style={{ 
@@ -66,7 +66,7 @@ export default function OverviewOpportunity({
         }}>
           <img 
             src={imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1200&auto=format&fit=crop'} 
-            alt={imageAlt || 'Placeholder image'}
+            alt={imageAlt || 'Overview image placeholder'}
             style={{
               maxWidth: '100%',
               height: 'auto',
@@ -79,7 +79,7 @@ export default function OverviewOpportunity({
             color: '#70757a', 
             fontSize: '14px' 
           }}>
-            Placeholder image — replace with brand asset.
+            {imageUrl ? 'Overview image' : 'Placeholder image — replace with brand asset'}
           </p>
         </div>
       </div>

@@ -37,10 +37,10 @@ export default function AmplificationContent({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {leftTitle || 'TwitchCon Showfloor Pods (Concept)'}
+            {leftTitle || '[Left Amplification Title - Please fill in]'}
           </h2>
-          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
-            {leftDescription || 'Branded broadcast pods with light overlays (#BoostedByCoke). Attendees stream on a short delay to featured channels.'}
+          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
+            {leftDescription || '[Left amplification description goes here - Please fill in]'}
           </p>
           {leftNote && (
             <p style={{ 
@@ -65,10 +65,10 @@ export default function AmplificationContent({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {rightTitle || 'Refresh Your Plays'}
+            {rightTitle || '[Right Amplification Title - Please fill in]'}
           </h2>
-          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: 1.5 }}>
-            {rightDescription || 'Creator-led segments that teach meta shifts & role transitions; UGC hook for community submissions.'}
+          <p style={{ margin: '0 0 12px', fontSize: '16px', lineHeight: '1.5' }}>
+            {rightDescription || '[Right amplification description goes here - Please fill in]'}
           </p>
           {rightBullets && rightBullets.length > 0 && (
             <ul style={{ margin: '0', paddingLeft: '20px' }}>

@@ -33,9 +33,9 @@ export default function MeasurementSuccess({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {leftTitle || 'How We Measure Success — Content'}
+            {leftTitle || '[Left Title - Please fill in]'}
           </h2>
-          {(leftBullets || ['Reach', 'Engagement', 'Brand Love (Affinity + Sentiment)']).map((bullet, index) => (
+          {(leftBullets || ['[Left bullet 1 - Please fill in]', '[Left bullet 2 - Please fill in]', '[Left bullet 3 - Please fill in]']).map((bullet, index) => (
             <ul key={index} style={{ margin: '0', paddingLeft: '20px' }}>
               <li style={{ marginBottom: '8px' }}>{bullet}</li>
             </ul>
@@ -52,9 +52,9 @@ export default function MeasurementSuccess({
             lineHeight: 1.2, 
             margin: '0 0 16px' 
           }}>
-            {rightTitle || 'How We Measure Success — Event'}
+            {rightTitle || '[Right Title - Please fill in]'}
           </h2>
-          {(rightBullets || ['Attendance', 'Participation', 'Attendee Feedback', 'Onsite Content Sentiment']).map((bullet, index) => (
+          {(rightBullets || ['[Right bullet 1 - Please fill in]', '[Right bullet 2 - Please fill in]', '[Right bullet 3 - Please fill in]', '[Right bullet 4 - Please fill in]']).map((bullet, index) => (
             <ul key={index} style={{ margin: '0', paddingLeft: '20px' }}>
               <li style={{ marginBottom: '8px' }}>{bullet}</li>
             </ul>
