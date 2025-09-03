@@ -31,8 +31,6 @@ export default function ProposalsPage() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showDrafts, setShowDrafts] = useState(false);
-
   // Get tenant from localStorage (synced with navbar)
   useEffect(() => {
     const savedTenant = localStorage.getItem('selectedTenant');
@@ -71,15 +69,15 @@ export default function ProposalsPage() {
     };
   }, [tenant]);
 
-  // Load proposals when tenant or draft filter changes
+  // Load proposals when tenant changes
   useEffect(() => {
     async function loadProposals() {
-      console.log('Proposals page - loading proposals for tenant:', tenant, 'showDrafts:', showDrafts);
+      console.log('Proposals page - loading proposals for tenant:', tenant);
       setLoading(true);
       setError(null);
       
       try {
-        const response = await fetch(`/api/proposals?tenant=${tenant}&draft=${showDrafts}`);
+        const response = await fetch(`/api/proposals?tenant=${tenant}`);
         const data: ProposalsResponse = await response.json();
         
         console.log('Proposals page - API response:', data);
@@ -100,7 +98,7 @@ export default function ProposalsPage() {
     if (tenant) {
       loadProposals();
     }
-  }, [tenant, showDrafts]);
+  }, [tenant]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -114,21 +112,7 @@ export default function ProposalsPage() {
 
   return (
     <PortalLayout title="View Proposals">
-      {/* Filters */}
-      <Card title="Filters">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="checkbox"
-            id="showDrafts"
-            checked={showDrafts}
-            onChange={(e) => setShowDrafts(e.target.checked)}
-            style={{ width: '16px', height: '16px' }}
-          />
-          <label htmlFor="showDrafts" style={{ fontSize: '14px', color: '#374151' }}>
-            Show drafts only
-          </label>
-        </div>
-      </Card>
+
 
       {/* Error Message */}
       {error && (
@@ -156,7 +140,7 @@ export default function ProposalsPage() {
               color: '#6b7280'
             }}>
               <p style={{ fontSize: '18px', marginBottom: '8px' }}>
-                No {showDrafts ? 'draft' : 'published'} proposals found
+                No proposals found
               </p>
               <p style={{ marginBottom: '20px' }}>Create your first proposal in the portal</p>
               <Link href="/portal" style={{ textDecoration: 'none' }}>
@@ -172,21 +156,44 @@ export default function ProposalsPage() {
                   key={proposal.slug}
                   style={{
                     padding: '20px',
-                    border: '1px solid #e5e7eb',
+                    border: proposal.is_draft ? '2px solid #fbbf24' : '1px solid #e5e7eb',
                     borderRadius: '12px',
-                    backgroundColor: '#f9fafb',
+                    backgroundColor: proposal.is_draft ? '#fefce8' : '#f9fafb',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                 >
-                  <div>
+                  {/* Draft overlay */}
+                  {proposal.is_draft && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '0',
+                      right: '0',
+                      backgroundColor: '#fbbf24',
+                      color: '#92400e',
+                      padding: '4px 12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      borderBottomLeftRadius: '8px',
+                      zIndex: 1
+                    }}>
+                      DRAFT
+                    </div>
+                  )}
+                  
+                  <div style={{ 
+                    flex: 1,
+                    marginRight: proposal.is_draft ? '60px' : '0' // Make room for draft badge
+                  }}>
                     <h3 style={{ 
                       fontSize: '18px', 
                       fontWeight: '600', 
                       marginBottom: '8px',
-                      color: proposal.is_draft ? '#6b7280' : '#111827'
+                      color: proposal.is_draft ? '#92400e' : '#111827'
                     }}>
                       {proposal.title}
                     </h3>
@@ -195,37 +202,42 @@ export default function ProposalsPage() {
                       <span>Updated: {formatDate(proposal.updated_at)}</span>
                     </div>
                     {proposal.is_draft && (
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '4px 8px',
-                        backgroundColor: '#fef3c7',
-                        color: '#92400e',
-                        borderRadius: '6px',
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '8px', 
+                        marginTop: '8px',
                         fontSize: '12px',
-                        fontWeight: '500',
-                        marginTop: '8px'
+                        color: '#92400e'
                       }}>
-                        Draft
-                      </span>
+                        <span style={{
+                          display: 'inline-block',
+                          width: '8px',
+                          height: '8px',
+                          backgroundColor: '#fbbf24',
+                          borderRadius: '50%'
+                        }}></span>
+                        Draft version - not published
+                      </div>
                     )}
                   </div>
                   
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <Link
-                      href={`/proposal/${proposal.slug}${proposal.is_draft ? '?draft=1' : ''}`}
+                      href={`/proposal/${proposal.slug}${proposal.is_draft ? '?draft=1&tenant=' + tenant : ''}`}
                       target="_blank"
                       style={{ textDecoration: 'none' }}
                     >
                       <Button variant="secondary">
-                        {proposal.is_draft ? 'Preview' : 'View'}
+                        {proposal.is_draft ? 'Preview Draft' : 'View Live'}
                       </Button>
                     </Link>
                     <Link
-                      href={`/portal?tenant=${tenant}&slug=${proposal.slug}`}
+                      href={`/portal?tenant=${tenant}&slug=${proposal.slug}${proposal.is_draft ? '&editDraft=true' : ''}`}
                       style={{ textDecoration: 'none' }}
                     >
-                      <Button variant="primary">
-                        Edit
+                                              <Button variant={proposal.is_draft ? 'secondary' : 'primary'}>
+                        {proposal.is_draft ? 'Edit Draft' : 'Edit Live'}
                       </Button>
                     </Link>
                   </div>

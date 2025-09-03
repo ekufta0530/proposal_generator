@@ -5,11 +5,13 @@ export const pool = new Pool({
 });
 
 // Helper function to set tenant context for RLS
-async function withTenantContext<T>(tenantId: string, operation: () => Promise<T>): Promise<T> {
+async function withTenantContext<T>(tenantId: string, operation: (client: any) => Promise<T>): Promise<T> {
   const client = await pool.connect();
   try {
     await client.query('SELECT set_tenant_context($1)', [tenantId]);
-    return await operation();
+    return await operation(client);
+  } catch (error) {
+    throw error;
   } finally {
     await client.query('SELECT clear_tenant_context()');
     client.release();
@@ -59,8 +61,8 @@ export interface ProposalContent {
 
 // Tenant Profile functions
 export async function getTenantProfile(tenantId: string): Promise<TenantProfile | null> {
-  return withTenantContext(tenantId, async () => {
-    const { rows } = await pool.query(
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
       `SELECT * FROM tenant_profiles WHERE tenant_id = $1 ORDER BY updated_at DESC LIMIT 1`,
       [tenantId]
     );
@@ -69,8 +71,8 @@ export async function getTenantProfile(tenantId: string): Promise<TenantProfile 
 }
 
 export async function saveTenantProfile(tenantId: string, data: any): Promise<TenantProfile> {
-  return withTenantContext(tenantId, async () => {
-    const { rows } = await pool.query(
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
       `INSERT INTO tenant_profiles (tenant_id, data) 
        VALUES ($1, $2) 
        ON CONFLICT (tenant_id) 
@@ -84,8 +86,8 @@ export async function saveTenantProfile(tenantId: string, data: any): Promise<Te
 
 // Tenant References functions
 export async function getTenantReferences(tenantId: string): Promise<TenantReferences | null> {
-  return withTenantContext(tenantId, async () => {
-    const { rows } = await pool.query(
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
       `SELECT * FROM tenant_references WHERE tenant_id = $1 ORDER BY updated_at DESC LIMIT 1`,
       [tenantId]
     );
@@ -93,10 +95,35 @@ export async function getTenantReferences(tenantId: string): Promise<TenantRefer
   });
 }
 
-export async function saveTenantReferences(tenantId: string, data: any): Promise<TenantReferences> {
-  return withTenantContext(tenantId, async () => {
-    const { rows } = await pool.query(
-      `INSERT INTO tenant_references (tenant_id, data) 
+export async function saveTenantReferences(tenantId: string, data: any, isDraft: boolean = false): Promise<TenantReferences> {
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
+      `INSERT INTO tenant_references (tenant_id, data, is_draft) 
+       VALUES ($1, $2, $3) 
+       ON CONFLICT (tenant_id, is_draft) 
+       DO UPDATE SET data = $2, updated_at = now() 
+       RETURNING *`,
+      [tenantId, data, isDraft]
+    );
+    return rows[0];
+  });
+}
+
+// Proposal Layout functions
+export async function getProposalLayout(tenantId: string): Promise<ProposalLayout | null> {
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
+      `SELECT * FROM proposal_layouts WHERE tenant_id = $1 ORDER BY updated_at DESC LIMIT 1`,
+      [tenantId]
+    );
+    return rows[0] || null;
+  });
+}
+
+export async function saveProposalLayout(tenantId: string, data: any): Promise<ProposalLayout> {
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
+      `INSERT INTO proposal_layouts (tenant_id, data) 
        VALUES ($1, $2) 
        ON CONFLICT (tenant_id) 
        DO UPDATE SET data = $2, updated_at = now() 
@@ -107,46 +134,29 @@ export async function saveTenantReferences(tenantId: string, data: any): Promise
   });
 }
 
-// Proposal Layout functions
-export async function getProposalLayout(tenantId: string): Promise<ProposalLayout | null> {
-  const { rows } = await pool.query(
-    `SELECT * FROM proposal_layouts WHERE tenant_id = $1 ORDER BY updated_at DESC LIMIT 1`,
-    [tenantId]
-  );
-  return rows[0] || null;
-}
-
-export async function saveProposalLayout(tenantId: string, data: any): Promise<ProposalLayout> {
-  const { rows } = await pool.query(
-    `INSERT INTO proposal_layouts (tenant_id, data) 
-     VALUES ($1, $2) 
-     ON CONFLICT (tenant_id) 
-     DO UPDATE SET data = $2, updated_at = now() 
-     RETURNING *`,
-    [tenantId, data]
-  );
-  return rows[0];
-}
-
 // Proposal Content functions
 export async function getProposalContent(tenantId: string, slug: string, isDraft: boolean = false): Promise<ProposalContent | null> {
-  const { rows } = await pool.query(
-    `SELECT * FROM proposal_content WHERE tenant_id = $1 AND slug = $2 AND is_draft = $3 ORDER BY updated_at DESC LIMIT 1`,
-    [tenantId, slug, isDraft]
-  );
-  return rows[0] || null;
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
+      `SELECT * FROM proposal_content WHERE tenant_id = $1 AND slug = $2 AND is_draft = $3 ORDER BY updated_at DESC LIMIT 1`,
+      [tenantId, slug, isDraft]
+    );
+    return rows[0] || null;
+  });
 }
 
 export async function saveProposalContent(tenantId: string, slug: string, data: any, isDraft: boolean = false): Promise<ProposalContent> {
-  const { rows } = await pool.query(
-    `INSERT INTO proposal_content (tenant_id, slug, data, is_draft) 
-     VALUES ($1, $2, $3, $4) 
-     ON CONFLICT (tenant_id, slug, is_draft) 
-     DO UPDATE SET data = $3, updated_at = now() 
-     RETURNING *`,
-    [tenantId, slug, data, isDraft]
-  );
-  return rows[0];
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
+      `INSERT INTO proposal_content (tenant_id, slug, data, is_draft) 
+       VALUES ($1, $2, $3, $4) 
+       ON CONFLICT (tenant_id, slug, is_draft) 
+       DO UPDATE SET data = $3, updated_at = now() 
+       RETURNING *`,
+      [tenantId, slug, data, isDraft]
+    );
+    return rows[0];
+  });
 }
 
 // List functions
@@ -156,11 +166,13 @@ export async function listTenants(): Promise<Array<{id: string, name: string}>> 
 }
 
 export async function listProposals(tenantId: string, isDraft: boolean = false): Promise<Array<{slug: string, updated_at: Date}>> {
-  const { rows } = await pool.query(
-    `SELECT slug, updated_at FROM proposal_content WHERE tenant_id = $1 AND is_draft = $2 ORDER BY updated_at DESC`,
-    [tenantId, isDraft]
-  );
-  return rows;
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
+      `SELECT slug, updated_at FROM proposal_content WHERE tenant_id = $1 AND is_draft = $2 ORDER BY updated_at DESC`,
+      [tenantId, isDraft]
+    );
+    return rows;
+  });
 }
 
 // Get proposal details for listing
@@ -170,26 +182,28 @@ export async function getProposalDetails(tenantId: string, slug: string): Promis
   updated_at: Date;
   is_draft: boolean;
 } | null> {
-  const { rows } = await pool.query(
-    `SELECT slug, data, updated_at, is_draft FROM proposal_content WHERE tenant_id = $1 AND slug = $2 ORDER BY updated_at DESC LIMIT 1`,
-    [tenantId, slug]
-  );
-  if (rows.length === 0) return null;
-  
-  const row = rows[0];
-  const data = row.data;
-  // Try to extract title from various possible locations in the data
-  const title = data?.Hero?.title || 
-                data?.title || 
-                data?.sections?.[0]?.props?.title ||
-                slug;
-  
-  return {
-    slug: row.slug,
-    title,
-    updated_at: row.updated_at,
-    is_draft: row.is_draft
-  };
+  return withTenantContext(tenantId, async (client) => {
+    const { rows } = await client.query(
+      `SELECT slug, data, updated_at, is_draft FROM proposal_content WHERE tenant_id = $1 AND slug = $2 ORDER BY updated_at DESC LIMIT 1`,
+      [tenantId, slug]
+    );
+    if (rows.length === 0) return null;
+    
+    const row = rows[0];
+    const data = row.data;
+    // Try to extract title from various possible locations in the data
+    const title = data?.Hero?.title || 
+                  data?.title || 
+                  data?.sections?.[0]?.props?.title ||
+                  slug;
+    
+    return {
+      slug: row.slug,
+      title,
+      updated_at: row.updated_at,
+      is_draft: row.is_draft
+    };
+  });
 }
 
 // Find which tenant has published data for a given slug

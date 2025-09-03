@@ -24,11 +24,8 @@ export async function POST(request: NextRequest) {
 
     const results = [];
 
-    // Save layout if provided
-    if (layout) {
-      const layoutResult = await saveProposalLayout(tenant, layout, isDraft);
-      results.push({ type: 'layout', id: layoutResult.id });
-    }
+    // Note: Layouts are default templates and should not be saved with proposals
+    // They are loaded separately when creating new proposals
 
     // Save proposal content if provided
     if (proposal && proposal.slug) {
@@ -38,13 +35,13 @@ export async function POST(request: NextRequest) {
 
     // Save profile if provided
     if (proposal?.profile) {
-      const profileResult = await saveTenantProfile(tenant, proposal.profile, isDraft);
+      const profileResult = await saveTenantProfile(tenant, proposal.profile);
       results.push({ type: 'profile', id: profileResult.id });
     }
 
     // Save references if provided
     if (proposal?.references) {
-      const referencesResult = await saveTenantReferences(tenant, proposal.references);
+      const referencesResult = await saveTenantReferences(tenant, proposal.references, isDraft);
       results.push({ type: 'references', id: referencesResult.id });
     }
     

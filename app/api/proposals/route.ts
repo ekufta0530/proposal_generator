@@ -5,7 +5,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const tenant = searchParams.get('tenant');
-    const isDraft = searchParams.get('draft') === 'true';
 
     if (!tenant) {
       return NextResponse.json(
@@ -14,12 +13,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get basic proposal list
-    const proposals = await listProposals(tenant, isDraft);
+    // Get both drafts and live proposals
+    const [draftProposals, liveProposals] = await Promise.all([
+      listProposals(tenant, true),  // drafts
+      listProposals(tenant, false)  // live
+    ]);
     
-    // Get detailed information for each proposal
+    // Get detailed information for all proposals
+    const allProposals = [...draftProposals, ...liveProposals];
     const detailedProposals = await Promise.all(
-      proposals.map(async (proposal) => {
+      allProposals.map(async (proposal) => {
         const details = await getProposalDetails(tenant, proposal.slug);
         return {
           slug: proposal.slug,
@@ -29,6 +32,9 @@ export async function GET(request: NextRequest) {
         };
       })
     );
+
+    // Sort by updated_at (most recent first)
+    detailedProposals.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
 
     return NextResponse.json({
       success: true,

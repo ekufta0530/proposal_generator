@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { loaders } from "@/components/sections/registry";
+import { loaders, metadata } from "@/components/sections/registry";
 import { LayoutSchema, ProfileSchema, ProposalSchema, ReferencesSchema } from "@/lib/schemas";
 import { deepMerge } from "@/lib/merge";
 import { interpolateTokens } from "@/lib/interpolate";
@@ -11,22 +11,21 @@ import {
   getProposalContent,
   findTenantForProposal
 } from "@/lib/db";
-
-
+import DraftProposalViewer from "./DraftProposalViewer";
 
 export default async function ProposalPage({
   params, searchParams
-}: { params:{ slug:string }, searchParams?: { draft?: string } }) {
+}: { params:{ slug:string }, searchParams?: { draft?: string, tenant?: string } }) {
   const draft = searchParams?.draft === "1";
   const slug = params.slug;
   
   // For live proposals: automatically detect which tenant has published this proposal
-  // For drafts: use a default tenant (since drafts are typically tenant-specific)
+  // For drafts: use the tenant from URL parameters
   let tenant: string;
   
   if (draft) {
-    // For drafts, use a default tenant since drafts are typically tenant-specific
-    tenant = "default";
+    // For drafts, use the tenant from URL parameters
+    tenant = searchParams?.tenant || "default";
   } else {
     // For live proposals, find which tenant has published this slug
     const foundTenant = await findTenantForProposal(slug);
@@ -34,6 +33,11 @@ export default async function ProposalPage({
       throw new Error(`No published proposal found with slug: ${slug}`);
     }
     tenant = foundTenant;
+  }
+
+  // If this is a draft, use the client-side component that can access localStorage
+  if (draft) {
+    return <DraftProposalViewer tenant={tenant} slug={slug} />;
   }
 
   // 1) Profile & references
@@ -69,26 +73,12 @@ export default async function ProposalPage({
 
   // 3) Content
   let proposalRaw:any = null;
-  if (draft) {
-    // For drafts: Database -> local -> stub
-    try { 
-      const contentRecord = await getProposalContent(tenant, slug, true);
-      if (contentRecord) {
-        proposalRaw = contentRecord.data;
-      }
-    } catch {}
-    if (!proposalRaw) {
-      proposalRaw = await localJson(`/seed/content/${tenant}/proposals/${slug}.json`).catch(()=> ({
-        Hero: { title: `Proposal for ${slug}` },
-        Problem: { bullets: [] }
-      }));
-    }
-  } else {
-    // For live: Database only, no fallbacks
-    const contentRecord = await getProposalContent(tenant, slug, false);
-    if (!contentRecord) throw new Error(`No live proposal found: ${tenant}/${slug}`);
-    proposalRaw = contentRecord.data;
-  }
+  
+  // For live: Database only, no fallbacks
+  const contentRecord = await getProposalContent(tenant, slug, false);
+  if (!contentRecord) throw new Error(`No live proposal found: ${tenant}/${slug}`);
+  proposalRaw = contentRecord.data;
+  
   const proposal = ProposalSchema.parse(proposalRaw);
 
   // 4) Compose + render
@@ -97,11 +87,21 @@ export default async function ProposalPage({
 
   const models = await Promise.all(sections.map(async (s:any) => {
     const base = (proposal as any)[s.type] || {};
+    
+    // Get defaults from metadata
+    const sectionMetadata = (metadata as any)[s.type];
+    const variantMetadata = sectionMetadata?.variants?.find((v: any) => v.id === s.variant);
+    const defaults = variantMetadata?.defaults || {};
+    
     const withTokens = interpolateTokens(base, ctx);
     if (s.type === "CustomerStories") {
       (withTokens as any).items = resolveReferences(withTokens, references);
     }
-    const finalData = deepMerge(withTokens, s.props || {});
+    
+    // Merge in this order: defaults -> proposal data -> section props
+    const withDefaults = deepMerge(defaults, withTokens);
+    const finalData = deepMerge(withDefaults, s.props || {});
+    
     const loader = loaders[s.type]?.[s.variant];
     if (!loader) return { key: `${s.type}-${s.variant}`, element: <div style={{color:'red',padding:12}}>Missing {s.type}.{s.variant}</div> };
     const Section = (await loader()).default;

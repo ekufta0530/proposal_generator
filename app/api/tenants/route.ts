@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listTenants, getTenantProfile } from '@/lib/db';
-import fs from 'fs';
-import path from 'path';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,21 +17,6 @@ export async function GET(request: NextRequest) {
           profile: profileRecord.data
         });
       } else {
-        // Fallback to local seed files for development
-        try {
-          const seedPath = path.join(process.cwd(), 'public', 'seed', 'tenants', tenant, 'profile.json');
-          if (fs.existsSync(seedPath)) {
-            const profileData = JSON.parse(fs.readFileSync(seedPath, 'utf-8'));
-            return NextResponse.json({
-              success: true,
-              tenant,
-              profile: profileData
-            });
-          }
-        } catch (error) {
-          console.log(`No seed file found for tenant: ${tenant}`);
-        }
-        
         return NextResponse.json(
           { success: false, error: `Tenant not found: ${tenant}` },
           { status: 404 }
