@@ -21,13 +21,7 @@ interface ProposalsResponse {
 }
 
 export default function ProposalsPage() {
-  const [tenant, setTenant] = useState<string>(() => {
-    // Initialize with localStorage value if available, otherwise 'default'
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('selectedTenant') || 'default';
-    }
-    return 'default';
-  });
+  const [tenant, setTenant] = useState<string>('default');
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,43 +29,7 @@ export default function ProposalsPage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState<string | null>(null);
 
-  // Get tenant from localStorage (synced with navbar)
-  useEffect(() => {
-    const savedTenant = localStorage.getItem('selectedTenant');
-    console.log('Proposals page - savedTenant from localStorage:', savedTenant);
-    if (savedTenant && savedTenant !== tenant) {
-      console.log('Proposals page - updating tenant from localStorage:', savedTenant);
-      setTenant(savedTenant);
-    }
-  }, [tenant]);
-
-  // Listen for localStorage changes (when tenant selector changes)
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'selectedTenant' && e.newValue && e.newValue !== tenant) {
-        console.log('Proposals page - localStorage changed, updating tenant:', e.newValue);
-        setTenant(e.newValue);
-      }
-    };
-
-    // Listen for changes from other tabs/windows
-    window.addEventListener('storage', handleStorageChange);
-
-    // Also listen for custom events (for same-tab changes)
-    const handleCustomStorageChange = (e: CustomEvent) => {
-      if (e.detail?.key === 'selectedTenant' && e.detail?.newValue && e.detail.newValue !== tenant) {
-        console.log('Proposals page - custom storage event, updating tenant:', e.detail.newValue);
-        setTenant(e.newValue);
-      }
-    };
-
-    window.addEventListener('localStorageChange', handleCustomStorageChange as EventListener);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('localStorageChange', handleCustomStorageChange as EventListener);
-    };
-  }, [tenant]);
+  // Tenant management removed - now handled via URL parameters
 
   // Load proposals when tenant changes
   useEffect(() => {

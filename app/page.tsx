@@ -3,51 +3,35 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
-interface Tenant {
+interface User {
   id: string;
+  email: string;
   name: string;
+  orgId: string;
+  role: string;
 }
 
 export default function Home() {
-  const [tenants, setTenants] = useState<Tenant[]>([]);
-  const [selectedTenant, setSelectedTenant] = useState<string>('default');
-  const [isLoadingTenants, setIsLoadingTenants] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
-  const navItems = [
-    { href: '/portal', label: 'Create Proposal', icon: '📝' },
-    { href: '/proposals', label: 'View Proposals', icon: '📋' },
-  ];
-
-  // Load tenants on component mount
+  // Check authentication status on component mount
   useEffect(() => {
-    async function loadTenants() {
+    async function checkAuth() {
       try {
-        const response = await fetch('/api/tenants');
+        const response = await fetch('/api/auth/me');
         const data = await response.json();
         if (data.success) {
-          setTenants(data.tenants || []);
-          // Set default tenant if available
-          if (data.tenants.length > 0) {
-            const savedTenant = localStorage.getItem('selectedTenant');
-            const defaultTenant = savedTenant && data.tenants.find((t: Tenant) => t.id === savedTenant) 
-              ? savedTenant 
-              : data.tenants[0].id;
-            setSelectedTenant(defaultTenant);
-          }
+          setUser(data.user);
         }
       } catch (error) {
-        console.error('Failed to load tenants:', error);
+        console.error('Failed to check auth status:', error);
       } finally {
-        setIsLoadingTenants(false);
+        setIsLoadingAuth(false);
       }
     }
-    loadTenants();
+    checkAuth();
   }, []);
-
-  const handleTenantChange = (tenantId: string) => {
-    setSelectedTenant(tenantId);
-    localStorage.setItem('selectedTenant', tenantId);
-  };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
@@ -90,61 +74,106 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Navigation Links */}
+          {/* Authentication Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {navItems.map((item) => (
+            {isLoadingAuth ? (
+              <div style={{
+                padding: '8px 12px',
+                color: '#6b7280',
+                fontSize: '14px'
+              }}>
+                Loading...
+              </div>
+            ) : user ? (
+              <>
+                <button
+                  onClick={() => window.location.href = '/portal'}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#2563eb';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#3b82f6';
+                  }}
+                >
+                  <span>🚀</span>
+                  Portal
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      await fetch('/api/auth/logout', { method: 'POST' });
+                      window.location.href = '/';
+                    } catch (error) {
+                      console.error('Logout failed:', error);
+                      // Still redirect to home even if logout fails
+                      window.location.href = '/';
+                    }
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    backgroundColor: '#6b7280',
+                    color: 'white',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#4b5563';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#6b7280';
+                  }}
+                >
+                  <span>🚪</span>
+                  Logout
+                </button>
+              </>
+            ) : (
               <Link
-                key={item.href}
-                href={item.href}
+                href="/login"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '8px 12px',
+                  padding: '8px 16px',
                   borderRadius: '6px',
-                  color: '#4b5563',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
                   textDecoration: 'none',
                   fontSize: '14px',
                   fontWeight: '500',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f3f4f6';
-                  e.currentTarget.style.color = '#1f2937';
+                  e.currentTarget.style.backgroundColor = '#2563eb';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#4b5563';
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
                 }}
               >
-                <span>{item.icon}</span>
-                {item.label}
+                <span>🔐</span>
+                Login
               </Link>
-            ))}
-
-            {/* Tenant Selector */}
-            {!isLoadingTenants && tenants.length > 0 && (
-              <div style={{ marginLeft: '16px' }}>
-                <select
-                  value={selectedTenant}
-                  onChange={(e) => handleTenantChange(e.target.value)}
-                  style={{
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    border: '1px solid #d1d5db',
-                    backgroundColor: 'white',
-                    fontSize: '14px',
-                    color: '#374151',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {tenants.map((tenant) => (
-                    <option key={tenant.id} value={tenant.id}>
-                      {tenant.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
             )}
           </div>
         </div>
@@ -233,61 +262,94 @@ export default function Home() {
             justifyContent: 'center',
             flexWrap: 'wrap'
           }}>
-            <Link
-              href="/portal"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '16px 32px',
-                backgroundColor: '#fbbf24',
-                color: '#1f2937',
-                textDecoration: 'none',
-                borderRadius: '12px',
-                fontWeight: '600',
-                fontSize: '16px',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(251, 191, 36, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.3)';
-              }}
-            >
-              🚀 Get Started
-            </Link>
-            
-            <Link
-              href="/proposals"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '16px 32px',
-                backgroundColor: 'transparent',
-                color: 'white',
-                textDecoration: 'none',
-                borderRadius: '12px',
-                fontWeight: '600',
-                fontSize: '16px',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-              }}
-            >
-              📋 View Examples
-            </Link>
+            {user ? (
+              <button
+                onClick={() => window.location.href = '/portal'}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '16px 32px',
+                  backgroundColor: '#fbbf24',
+                  color: '#1f2937',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(251, 191, 36, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.3)';
+                }}
+              >
+                🚀 Go to Portal
+              </button>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '16px 32px',
+                    backgroundColor: '#fbbf24',
+                    color: '#1f2937',
+                    textDecoration: 'none',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(251, 191, 36, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.3)';
+                  }}
+                >
+                  🚀 Get Started
+                </Link>
+                
+                <Link
+                  href="/register"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '16px 32px',
+                    backgroundColor: 'transparent',
+                    color: 'white',
+                    textDecoration: 'none',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  }}
+                >
+                  📝 Create Account
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Feature Highlights */}

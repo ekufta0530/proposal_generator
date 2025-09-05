@@ -9,6 +9,7 @@ type Profile = { branding: { name: string; colors: { primary: string } } };
 
 interface PortalEditorProps {
   initialTenant: string;
+  initialOrgId?: string;
   initialProfile: Profile | null;
   initialSections: SectionChoice[];
   initialProposal: any;
@@ -18,6 +19,7 @@ interface PortalEditorProps {
 
 export default function PortalEditor({
   initialTenant,
+  initialOrgId,
   initialProfile,
   initialSections,
   initialProposal,
@@ -45,7 +47,10 @@ export default function PortalEditor({
       
       setIsLoadingProfile(true);
       try {
-        const response = await fetch(`/api/tenants?tenant=${tenant}`);
+        const url = initialOrgId 
+          ? `/api/tenants?tenant=${tenant}&org_id=${initialOrgId}`
+          : `/api/tenants?tenant=${tenant}`;
+        const response = await fetch(url);
         const data = await response.json();
         if (data.success) {
           setCurrentProfile(data.profile);
@@ -65,7 +70,10 @@ export default function PortalEditor({
       if (!tenant || tenant === initialTenant) return; // Skip if it's the initial tenant
       
       try {
-        const response = await fetch(`/api/layout?tenant=${tenant}`);
+        const url = initialOrgId 
+          ? `/api/layout?tenant=${tenant}&org_id=${initialOrgId}`
+          : `/api/layout?tenant=${tenant}`;
+        const response = await fetch(url);
         const data = await response.json();
         if (data.success && data.layout?.data?.sections) {
           console.log('Portal - loaded layout sections:', data.layout.data.sections);
@@ -78,44 +86,7 @@ export default function PortalEditor({
     loadLayout();
   }, [tenant, initialTenant]);
 
-  // Sync tenant state with localStorage on mount and changes
-  useEffect(() => {
-    const savedTenant = localStorage.getItem('selectedTenant');
-    if (savedTenant && savedTenant !== tenant) {
-      console.log('Portal - syncing tenant state with localStorage:', savedTenant);
-      setTenant(savedTenant);
-    }
-  }, [tenant]);
-
-  // Listen for tenant changes from the global selector
-  useEffect(() => {
-    function handleTenantChange(event: Event) {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail?.key === 'selectedTenant') {
-        const newTenant = customEvent.detail.newValue;
-        console.log('Portal - tenant changed via event:', newTenant);
-        setTenant(newTenant);
-      }
-    }
-
-    function handleStorageChange(event: StorageEvent) {
-      if (event.key === 'selectedTenant' && event.newValue) {
-        console.log('Portal - tenant changed via storage event:', event.newValue);
-        setTenant(event.newValue);
-      }
-    }
-
-    // Listen for custom event (same tab)
-    window.addEventListener('localStorageChange', handleTenantChange);
-    
-    // Listen for storage event (cross tab)
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('localStorageChange', handleTenantChange);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  // Tenant is now managed via URL parameters only
 
   // Load existing proposal data when editing (check URL params)
   useEffect(() => {
@@ -172,9 +143,10 @@ export default function PortalEditor({
     
     try {
       // Load proposal from database (draft or live)
-      const url = isDraft 
+      const baseUrl = isDraft 
         ? `/api/proposal?tenant=${tenant}&slug=${proposalSlug}&draft=true`
         : `/api/proposal?tenant=${tenant}&slug=${proposalSlug}`;
+      const url = initialOrgId ? `${baseUrl}&org_id=${initialOrgId}` : baseUrl;
       
       console.log('loadProposalFromDatabase - fetching from:', url);
       const response = await fetch(url);
@@ -219,7 +191,6 @@ export default function PortalEditor({
       localStorage.setItem(`proposal:${tenant}:${slug}`,JSON.stringify(proposal));
       
       console.log('Portal - current tenant state:', tenant);
-      console.log('Portal - localStorage selectedTenant:', localStorage.getItem('selectedTenant'));
       
       const requestBody = {
         tenant,
@@ -312,8 +283,12 @@ export default function PortalEditor({
     }
   }
 
-  const preview=`/proposal/${slug}?draft=1&tenant=${tenant}`;
-  const live=`/proposal/${slug}`;
+  const preview = initialOrgId 
+    ? `/proposal/${slug}?draft=1&tenant=${tenant}&org_id=${initialOrgId}`
+    : `/proposal/${slug}?draft=1&tenant=${tenant}`;
+  const live = initialOrgId 
+    ? `/proposal/${slug}?tenant=${tenant}&org_id=${initialOrgId}`
+    : `/proposal/${slug}`;
 
   return (
     <>

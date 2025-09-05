@@ -9,15 +9,18 @@ import {
   getTenantReferences, 
   getProposalLayout, 
   getProposalContent,
-  findTenantForProposal
+  findTenantForProposal,
+  validateTenantForOrganization
 } from "@/lib/db";
+import { isValidOrgId } from "@/lib/nanoid";
 import DraftProposalViewer from "./DraftProposalViewer";
 
 export default async function ProposalPage({
   params, searchParams
-}: { params:{ slug:string }, searchParams?: { draft?: string, tenant?: string } }) {
+}: { params:{ slug:string }, searchParams?: { draft?: string, tenant?: string, org_id?: string } }) {
   const draft = searchParams?.draft === "1";
   const slug = params.slug;
+  const orgId = searchParams?.org_id;
   
   // For live proposals: automatically detect which tenant has published this proposal
   // For drafts: use the tenant from URL parameters
@@ -35,9 +38,22 @@ export default async function ProposalPage({
     tenant = foundTenant;
   }
 
+  // Validate org ID format if provided
+  if (orgId && !isValidOrgId(orgId)) {
+    throw new Error('Invalid organization ID format. Must be 8 characters using A-Z, a-z, 0-9, _, -');
+  }
+
+  // Validate tenant belongs to organization if org_id is provided
+  if (orgId) {
+    const isValid = await validateTenantForOrganization(tenant, orgId);
+    if (!isValid) {
+      throw new Error(`Tenant ${tenant} does not belong to organization ${orgId}`);
+    }
+  }
+
   // If this is a draft, use the client-side component that can access localStorage
   if (draft) {
-    return <DraftProposalViewer tenant={tenant} slug={slug} />;
+    return <DraftProposalViewer tenant={tenant} slug={slug} orgId={orgId} />;
   }
 
   // 1) Profile & references

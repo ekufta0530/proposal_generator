@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import TenantSelector from './TenantSelector';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
@@ -16,58 +17,26 @@ interface Tenant {
 
 export default function PortalLayout({ children, title = "Portal" }: PortalLayoutProps) {
   const pathname = usePathname();
-  const [tenants, setTenants] = useState<Tenant[]>([]);
-  const [selectedTenant, setSelectedTenant] = useState<string>('default');
-  const [isLoadingTenants, setIsLoadingTenants] = useState(true);
+  const searchParams = useSearchParams();
+  
+  // Extract current tenant and org_id from URL
+  const currentTenant = searchParams.get('tenant') || '';
+  const orgId = searchParams.get('org_id') || '';
+
+  // Build navigation items with current org_id and tenant parameters
+  const buildNavUrl = (path: string) => {
+    const url = new URL(path, window.location.origin);
+    if (orgId) url.searchParams.set('org_id', orgId);
+    if (currentTenant) url.searchParams.set('tenant', currentTenant);
+    return url.pathname + url.search;
+  };
 
   const navItems = [
-    { href: '/portal', label: 'Create Proposal', icon: '📝' },
-    { href: '/proposals', label: 'View Proposals', icon: '📋' },
+    { href: buildNavUrl('/portal'), label: 'Create Proposal', icon: '📝' },
+    { href: buildNavUrl('/proposals'), label: 'View Proposals', icon: '📋' },
   ];
 
-  // Load tenants on component mount
-  useEffect(() => {
-    async function loadTenants() {
-      console.log('PortalLayout - loading tenants...');
-      try {
-        const response = await fetch('/api/tenants');
-        const data = await response.json();
-        console.log('PortalLayout - tenants API response:', data);
-        if (data.success) {
-          setTenants(data.tenants || []);
-          // Set default tenant if available
-          if (data.tenants.length > 0) {
-            const savedTenant = localStorage.getItem('selectedTenant');
-            console.log('PortalLayout - savedTenant from localStorage:', savedTenant);
-            const defaultTenant = savedTenant && data.tenants.find((t: Tenant) => t.id === savedTenant) 
-              ? savedTenant 
-              : data.tenants[0].id;
-            console.log('PortalLayout - setting default tenant:', defaultTenant);
-            setSelectedTenant(defaultTenant);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load tenants:', error);
-      } finally {
-        setIsLoadingTenants(false);
-      }
-    }
-    loadTenants();
-  }, []);
-
-  const handleTenantChange = (tenantId: string) => {
-    setSelectedTenant(tenantId);
-    localStorage.setItem('selectedTenant', tenantId);
-    
-    // Dispatch custom event for same-tab listeners
-    window.dispatchEvent(new CustomEvent('localStorageChange', {
-      detail: {
-        key: 'selectedTenant',
-        newValue: tenantId,
-        oldValue: selectedTenant
-      }
-    }));
-  };
+  // Tenant management removed - now handled via URL parameters only
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -135,44 +104,51 @@ export default function PortalLayout({ children, title = "Portal" }: PortalLayou
             ))}
           </div>
 
-          {/* Right side - Tenant selector and Back to Site */}
+          {/* Right side - Tenant Selector, Logout and Back to Site */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Tenant Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <label style={{ 
-                fontSize: '14px', 
-                color: '#6b7280', 
+            {currentTenant && (
+              <TenantSelector 
+                currentTenant={currentTenant} 
+                orgId={orgId} 
+              />
+            )}
+            
+            <button
+              onClick={async () => {
+                try {
+                  await fetch('/api/auth/logout', { method: 'POST' });
+                  window.location.href = '/';
+                } catch (error) {
+                  console.error('Logout failed:', error);
+                  // Still redirect to home even if logout fails
+                  window.location.href = '/';
+                }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                backgroundColor: '#dc2626',
+                color: 'white',
+                border: 'none',
+                fontSize: '14px',
                 fontWeight: '500',
-                whiteSpace: 'nowrap'
-              }}>
-                Tenant:
-              </label>
-              <select 
-                value={selectedTenant}
-                onChange={(e) => handleTenantChange(e.target.value)}
-                disabled={isLoadingTenants}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #d1d5db',
-                  backgroundColor: 'white',
-                  fontSize: '14px',
-                  minWidth: '120px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {isLoadingTenants ? (
-                  <option>Loading...</option>
-                ) : (
-                  tenants.map(t => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#b91c1c';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#dc2626';
+              }}
+            >
+              <span>🚪</span>
+              Logout
+            </button>
 
             <Link
               href="/"

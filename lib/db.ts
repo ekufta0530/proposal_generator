@@ -159,6 +159,38 @@ export async function saveProposalContent(tenantId: string, slug: string, data: 
   });
 }
 
+// Organization functions
+export async function getOrganization(orgId: string): Promise<{id: string, name: string, default_tenant: string | null} | null> {
+  const { rows } = await pool.query(`SELECT id, name, default_tenant FROM organizations WHERE id = $1`, [orgId]);
+  return rows[0] || null;
+}
+
+export async function createOrganization(name: string, orgId?: string): Promise<{id: string, name: string}> {
+  const { nanoid } = await import('nanoid');
+  const id = orgId || nanoid(8);
+  
+  const { rows } = await pool.query(
+    `INSERT INTO organizations (id, name) VALUES ($1, $2) RETURNING id, name`,
+    [id, name]
+  );
+  return rows[0];
+}
+
+export async function listOrganizations(): Promise<Array<{id: string, name: string, default_tenant: string | null}>> {
+  const { rows } = await pool.query(`SELECT id, name, default_tenant FROM organizations ORDER BY name`);
+  return rows;
+}
+
+export async function listTenantsForOrganization(orgId: string): Promise<Array<{id: string, name: string}>> {
+  const { rows } = await pool.query(`SELECT id, name FROM tenants WHERE org_id = $1 ORDER BY name`, [orgId]);
+  return rows;
+}
+
+export async function validateTenantForOrganization(tenantId: string, orgId: string): Promise<boolean> {
+  const { rows } = await pool.query(`SELECT 1 FROM tenants WHERE id = $1 AND org_id = $2`, [tenantId, orgId]);
+  return rows.length > 0;
+}
+
 // List functions
 export async function listTenants(): Promise<Array<{id: string, name: string}>> {
   const { rows } = await pool.query(`SELECT id, name FROM tenants ORDER BY name`);
@@ -253,6 +285,57 @@ export async function deleteMultipleProposals(tenantId: string, proposals: Array
     };
   });
 }
+
+// Authentication functions
+export async function createUser(email: string, passwordHash: string, name: string): Promise<{id: string, email: string, name: string}> {
+  const { rows } = await pool.query(
+    `INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name`,
+    [email, passwordHash, name]
+  );
+  return rows[0];
+}
+
+export async function getUserByEmail(email: string): Promise<{id: string, email: string, name: string, password_hash: string, is_active: boolean} | null> {
+  const { rows } = await pool.query(
+    `SELECT id, email, name, password_hash, is_active FROM users WHERE email = $1 AND is_active = true`,
+    [email]
+  );
+  return rows[0] || null;
+}
+
+export async function getUserById(id: string): Promise<{id: string, email: string, name: string, is_active: boolean} | null> {
+  const { rows } = await pool.query(
+    `SELECT id, email, name, is_active FROM users WHERE id = $1 AND is_active = true`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+// User-Organization relationship functions
+export async function addUserToOrganization(userId: string, orgId: string, role: 'owner' | 'admin' | 'member' = 'member'): Promise<void> {
+  await pool.query(
+    `INSERT INTO user_organizations (user_id, org_id, role) VALUES ($1, $2, $3) ON CONFLICT (user_id, org_id) DO UPDATE SET role = $3`,
+    [userId, orgId, role]
+  );
+}
+
+export async function getUserOrganizations(userId: string): Promise<Array<{org_id: string, role: string}>> {
+  const { rows } = await pool.query(
+    `SELECT org_id, role FROM user_organizations WHERE user_id = $1`,
+    [userId]
+  );
+  return rows;
+}
+
+export async function getUserOrganization(userId: string, orgId: string): Promise<{org_id: string, role: string} | null> {
+  const { rows } = await pool.query(
+    `SELECT org_id, role FROM user_organizations WHERE user_id = $1 AND org_id = $2`,
+    [userId, orgId]
+  );
+  return rows[0] || null;
+}
+
+// User-Tenant relationship functions removed - all access controlled via organization membership
 
 // Database health check
 export async function testDatabaseConnection(): Promise<{success: boolean, message: string}> {

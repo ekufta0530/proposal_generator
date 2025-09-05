@@ -62,12 +62,15 @@ The platform uses PostgreSQL with JSONB for flexible document storage and Row Le
 ### Core Tables
 
 ```sql
+-- Organization management
+organizations (id, name, default_tenant, created_at)
+
 -- Tenant management
-tenants (id, name, root_domain, created_at)
+tenants (id, name, org_id, root_domain, created_at)
 
 -- User management  
-users (id, email, created_at)
-memberships (user_id, tenant_id, role)
+users (id, email, password_hash, name, is_active, created_at, updated_at)
+user_organizations (user_id, org_id, role, created_at)
 
 -- Tenant data (JSONB)
 tenant_profiles (tenant_id, data, created_at, updated_at)

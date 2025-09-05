@@ -10,9 +10,10 @@ import { resolveReferences } from "@/lib/references";
 interface DraftProposalViewerProps {
   tenant: string;
   slug: string;
+  orgId?: string;
 }
 
-export default function DraftProposalViewer({ tenant, slug }: DraftProposalViewerProps) {
+export default function DraftProposalViewer({ tenant, slug, orgId }: DraftProposalViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [proposal, setProposal] = useState<any>(null);
@@ -24,10 +25,13 @@ export default function DraftProposalViewer({ tenant, slug }: DraftProposalViewe
     async function loadDraftData() {
       try {
         // Load profile and references from database (these don't have draft functionality)
+        const profileUrl = orgId ? `/api/tenants?tenant=${tenant}&org_id=${orgId}` : `/api/tenants?tenant=${tenant}`;
+        const layoutUrl = orgId ? `/api/layout?tenant=${tenant}&org_id=${orgId}` : `/api/layout?tenant=${tenant}`;
+        
         const [profileResponse, referencesResponse, layoutResponse] = await Promise.all([
-          fetch(`/api/tenants?tenant=${tenant}`),
-          fetch(`/api/tenants?tenant=${tenant}`), // We'll get references from the same endpoint
-          fetch(`/api/layout?tenant=${tenant}`)
+          fetch(profileUrl),
+          fetch(profileUrl), // We'll get references from the same endpoint
+          fetch(layoutUrl)
         ]);
 
         const profileData = await profileResponse.json();
@@ -70,7 +74,10 @@ export default function DraftProposalViewer({ tenant, slug }: DraftProposalViewe
         // If no localStorage data, try database
         if (!proposalData) {
           try {
-            const draftResponse = await fetch(`/api/proposal?tenant=${tenant}&slug=${slug}&draft=true`);
+            const draftUrl = orgId 
+              ? `/api/proposal?tenant=${tenant}&slug=${slug}&draft=true&org_id=${orgId}`
+              : `/api/proposal?tenant=${tenant}&slug=${slug}&draft=true`;
+            const draftResponse = await fetch(draftUrl);
             const draftData = await draftResponse.json();
             
             if (draftData.success && draftData.proposal) {

@@ -1,8 +1,10 @@
 import { Suspense } from "react";
+import { redirect, notFound } from "next/navigation";
 import PortalLayout from "@/components/PortalLayout";
 import PortalEditor from "@/components/PortalEditor";
 import { metadata } from "@/components/sections/registry";
-import { getTenantProfile, getProposalLayout, getProposalContent } from "@/lib/db";
+import { getTenantProfile, getProposalLayout, getProposalContent, getOrganization, validateTenantForOrganization } from "@/lib/db";
+import { isValidOrgId } from "@/lib/nanoid";
 
 // Server-side data fetching functions
 async function getTenantProfileData(tenant: string) {
@@ -40,16 +42,57 @@ async function getInitialProposalData(tenant: string, slug?: string, isDraft?: b
 export default async function PortalPage({
   searchParams,
 }: {
-  searchParams: { slug?: string; editDraft?: string };
+  searchParams: { org_id?: string; tenant?: string; slug?: string; editDraft?: string };
 }) {
-  // Get default tenant (could be enhanced with user authentication)
-  const defaultTenant = "default";
+  const orgId = searchParams.org_id;
+  let tenant = searchParams.tenant;
+  
+  // Validate org_id format if provided
+  if (orgId && !isValidOrgId(orgId)) {
+    console.error('Invalid organization ID format:', orgId);
+    notFound();
+  }
+  
+  // If org_id is provided but no tenant, redirect to default tenant for that org
+  if (orgId && !tenant) {
+    try {
+      const organization = await getOrganization(orgId);
+      if (organization?.default_tenant) {
+        const redirectUrl = `/portal?org_id=${orgId}&tenant=${organization.default_tenant}`;
+        redirect(redirectUrl);
+      } else {
+        // Organization exists but has no default tenant
+        console.error('Organization has no default tenant:', orgId);
+        notFound();
+      }
+    } catch (error) {
+      console.error('Failed to get organization:', error);
+      notFound();
+    }
+  }
+  
+  // Get tenant from URL parameters or default
+  tenant = tenant || "default";
+  
+  // If org_id is provided, validate tenant belongs to organization
+  if (orgId && tenant) {
+    try {
+      const isValid = await validateTenantForOrganization(tenant, orgId);
+      if (!isValid) {
+        console.error(`Tenant ${tenant} does not belong to organization ${orgId}`);
+        notFound();
+      }
+    } catch (error) {
+      console.error('Failed to validate tenant-organization relationship:', error);
+      notFound();
+    }
+  }
   
   // Fetch initial data on the server
   const [profile, sections, proposal] = await Promise.all([
-    getTenantProfileData(defaultTenant),
-    getTenantLayoutData(defaultTenant),
-    getInitialProposalData(defaultTenant, searchParams.slug, searchParams.editDraft === 'true')
+    getTenantProfileData(tenant),
+    getTenantLayoutData(tenant),
+    getInitialProposalData(tenant, searchParams.slug, searchParams.editDraft === 'true')
   ]);
 
   // Compute derived constants on the server
@@ -59,7 +102,8 @@ export default async function PortalPage({
     <PortalLayout title="Create Proposal">
       <Suspense fallback={<div>Loading portal editor...</div>}>
         <PortalEditor
-          initialTenant={defaultTenant}
+          initialTenant={tenant}
+          initialOrgId={orgId}
           initialProfile={profile}
           initialSections={sections}
           initialProposal={proposal}
