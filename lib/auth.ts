@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 // JWT configuration
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_EXPIRES_IN = '15m'; // 15 minutes
+const JWT_EXPIRES_IN = '7d'; // 7 days (1 week)
 const COOKIE_NAME = 'auth-token';
 
 // Types
@@ -69,7 +69,7 @@ export function setAuthCookie(response: NextResponse, token: string): void {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 15 * 60, // 15 minutes
+    maxAge: 7 * 24 * 60 * 60, // 7 days (1 week)
     path: '/'
   });
 }

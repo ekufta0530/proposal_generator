@@ -1,27 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PortalLayout from '@/components/PortalLayout';
 import { Button, Select, Card, StatusMessage } from '@/components/ui/PortalStyles';
+import { useSearchParams } from 'next/navigation';
+
 
 interface Proposal {
   slug: string;
   title: string;
   updated_at: string;
   is_draft: boolean;
+  tenant_id: string;       // need cause of change to listing by org not tenant 
+  tenant_name?: string; // ^same
 }
+
 
 interface ProposalsResponse {
   success: boolean;
-  tenant: string;
+  org_id?: string | null;   // in case I wanna have org_id auto added to obj in proposal_content table. multi org support or other use case
+  tenant: string;           // 'all' or tenant id
   proposals: Proposal[];
   count: number;
   error?: string;
 }
 
 export default function ProposalsPage() {
-  const [tenant, setTenant] = useState<string>('default');
+  // Use serch params instead of state to get orgid
+  const orgId = useSearchParams().get('org_id');
+  console.log(orgId)
+  const searchParams = useSearchParams();
+  console.log(searchParams)
+  const tenantFilter = searchParams.get('tenant') ?? 'default';
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,39 +40,42 @@ export default function ProposalsPage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState<string | null>(null);
 
-  // Tenant management removed - now handled via URL parameters
 
-  // Load proposals when tenant changes
   useEffect(() => {
-    async function loadProposals() {
-      console.log('Proposals page - loading proposals for tenant:', tenant);
+    async function loadAllForOrg() {
+      if (!orgId) {
+        setError('Missing org_id');
+        return;
+      }
       setLoading(true);
       setError(null);
-      setSelectedProposals(new Set()); // Clear selections when tenant changes
-      
+      setSelectedProposals(new Set());
+  
       try {
-        const response = await fetch(`/api/proposals?tenant=${tenant}`);
-        const data: ProposalsResponse = await response.json();
-        
-        console.log('Proposals page - API response:', data);
-        
+        const res = await fetch(`/api/proposals?org_id=${encodeURIComponent(orgId)}&tenant=all`);
+        const data: ProposalsResponse = await res.json();
+  
         if (data.success) {
           setProposals(data.proposals || []);
         } else {
           setError(data.error || 'Failed to load proposals');
         }
-      } catch (err) {
-        console.error('Failed to load proposals:', err);
+      } catch (e) {
         setError('Failed to load proposals');
       } finally {
         setLoading(false);
       }
     }
+  
+    loadAllForOrg();
+  }, [orgId]);
+  
+  // filter client-side
+  const visibleProposals = useMemo(() => {
+    if (tenantFilter === 'all') return proposals;
+    return proposals.filter(p => p.tenant_id === tenantFilter);
+  }, [proposals, tenantFilter]);
 
-    if (tenant) {
-      loadProposals();
-    }
-  }, [tenant]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -103,7 +117,7 @@ export default function ProposalsPage() {
     setDeleteStatus(`Deleting ${proposal.title}...`);
 
     try {
-      const response = await fetch(`/api/sections?tenant=${tenant}&slug=${proposal.slug}&isDraft=${proposal.is_draft}`, {
+      const response = await fetch(`/api/sections?tenant=${tenantFilter}&slug=${proposal.slug}&isDraft=${proposal.is_draft}`, {
         method: 'DELETE'
       });
 
@@ -146,7 +160,7 @@ export default function ProposalsPage() {
     setDeleteStatus(`Deleting ${selectedProposals.size} proposal(s)...`);
 
     try {
-      const response = await fetch(`/api/sections?tenant=${tenant}`, {
+      const response = await fetch(`/api/sections?tenant=${tenantFilter}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -346,7 +360,7 @@ export default function ProposalsPage() {
                     
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <Link
-                        href={`/proposal/${proposal.slug}${proposal.is_draft ? '?draft=1&tenant=' + tenant : ''}`}
+                        href={`/proposal/${proposal.slug}${proposal.is_draft ? '?draft=1&tenant=' + tenantFilter : ''}`}
                         target="_blank"
                         style={{ textDecoration: 'none' }}
                       >
@@ -355,7 +369,7 @@ export default function ProposalsPage() {
                         </Button>
                       </Link>
                       <Link
-                        href={`/portal?tenant=${tenant}&slug=${proposal.slug}${proposal.is_draft ? '&editDraft=true' : ''}`}
+                        href={`/portal?tenant=${tenantFilter}&slug=${proposal.slug}${proposal.is_draft ? '&editDraft=true' : ''}`}
                         style={{ textDecoration: 'none' }}
                       >
                         <Button variant={proposal.is_draft ? 'secondary' : 'primary'}>

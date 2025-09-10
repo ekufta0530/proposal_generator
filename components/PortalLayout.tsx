@@ -10,11 +10,6 @@ interface PortalLayoutProps {
   title?: string;
 }
 
-interface Tenant {
-  id: string;
-  name: string;
-}
-
 export default function PortalLayout({ children, title = "Portal" }: PortalLayoutProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();

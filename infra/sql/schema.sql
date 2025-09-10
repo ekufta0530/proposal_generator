@@ -36,10 +36,6 @@ create table if not exists user_organizations (
   primary key (user_id, org_id)
 );
 
--- User-Tenant relationships removed - all access controlled via organization membership
-
--- Legacy memberships table removed - using organization-based access control only
-
 -- Tenant profiles (branding, company information, etc.)
 create table if not exists tenant_profiles (
   id uuid primary key default gen_random_uuid(),
